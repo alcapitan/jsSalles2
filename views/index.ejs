@@ -24,7 +24,7 @@
                 <% for (const room in freeRooms) { %>
                     <tr>
                         <td><%= room %></td>
-                        <td><%= freeRooms[room].nextCourse ? new Date(toDate(freeRooms[room].nextCourse.dtstart)).toLocaleTimeString() : 'Aucun cours prévu' %></td>
+                        <td><%= freeRooms[room].nextCourse ? new Date(toDate(freeRooms[room].nextCourse.dtstart)).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', hour12: false }) : 'Aucun cours prévu' %></td>
                     </tr>
                 <% } %>
             </tbody>
@@ -46,9 +46,9 @@
             const table = document.getElementById('roomsTable');
             const rows = Array.from(table.rows).slice(1);
             rows.sort((a, b) => {
-                const timeA = a.cells[1].innerText === 'Aucun cours prévu' ? Infinity : new Date('1970-01-01T' + a.cells[1].innerText).toLocaleString('en-GB');
-                const timeB = b.cells[1].innerText === 'Aucun cours prévu' ? Infinity : new Date('1970-01-01T' + b.cells[1].innerText).toLocaleString('en-GB');
-                return timeB - timeA; // Inverser l'ordre de tri
+                const timeA = a.cells[1].innerText === 'Aucun cours prévu' ? Infinity : new Date('1970-01-01T' + a.cells[1].innerText);
+                const timeB = b.cells[1].innerText === 'Aucun cours prévu' ? Infinity : new Date('1970-01-01T' + b.cells[1].innerText);
+                return timeA - timeB; // Tri par ordre croissant
             });
             rows.forEach(row => table.appendChild(row));
         }
