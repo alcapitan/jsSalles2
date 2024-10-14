@@ -66,8 +66,6 @@ function getClassCourses(url) {
                 return eventDate.getDate() == today.getDate() && eventDate.getMonth() == today.getMonth() && eventDate.getFullYear() == today.getFullYear();
             });
 
-            // console.log('Événements d\'aujourd\'hui:', todayEvents);
-
             return todayEvents; // Move return statement here
         })
         .catch(error => {
@@ -79,33 +77,39 @@ function getClassCourses(url) {
 function isClassFree(courses) {
     let nextCourse = null;
     let nextCourseDiff = null;
-    if (courses.length === 0) { return {free: true, nextCourse: nextCourse}; }
+    if (courses.length === 0) { return { free: true, nextCourse: nextCourse }; }
     const now = new Date();
 
-    for(const course of courses) {
-        if(toDate(course.dtstart) < now && toDate(course.dtend) > now) {
-            return {free: false, courses: courses};
+    for (const course of courses) {
+        if (!course || !course.dtstart || !course.dtend) {
+            console.warn('Invalid course data:', course);
+            continue;
         }
-        else if(nextCourse != null){
-            if(toDate(course.dtstart) > now) {
-                const diff = Date.parse(toDate(course.dtstart)) - Date.parse(toDate(nextCourse.dtstart));
-                if(diff < nextCourseDiff) {
+
+        const courseStart = toDate(course.dtstart);
+        const courseEnd = toDate(course.dtend);
+
+        // La salle est occupée
+        if (courseStart < now && courseEnd > now) {
+            return { free: false, courses: courses };
+        } else if (nextCourse != null) {
+            // Si le cours est dans le futur
+            if (courseStart > now) {
+                const diff = courseStart - toDate(nextCourse.dtstart);
+                if (diff < nextCourseDiff) {
                     nextCourseDiff = diff;
                     nextCourse = course;
                 }
             }
-        }
-        else if (nextCourse == null) {
-            if(toDate(course.dtstart) > now) {
-                
-                nextCourseDiff = Date.parse(toDate(course.dtstart)) - Date.parse(toDate(nextCourse.dtstart));
+        } else if (nextCourse == null) {
+            if (courseStart > now) {
+                nextCourseDiff = courseStart - now;
                 nextCourse = course;
             }
         }
     }
 
-    return {free: true, nextCourse: nextCourse}
-
+    return { free: true, nextCourse: nextCourse };
 }
 
 const fs = require('fs');

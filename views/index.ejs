@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salles Libres</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Salles Libres</h1>
+        <div class="buttons">
+            <button onclick="sortByName()">Trier par nom</button>
+            <button onclick="sortByTime()">Trier par heure</button>
+        </div>
+        <table id="roomsTable">
+            <thead>
+                <tr>
+                    <th>Salle</th>
+                    <th>Prochain cours</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (const room in freeRooms) { %>
+                    <tr>
+                        <td><%= room %></td>
+                        <td><%= freeRooms[room].nextCourse ? new Date(toDate(freeRooms[room].nextCourse.dtstart)).toLocaleTimeString() : 'Aucun cours prévu' %></td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        function sortByName() {
+            const table = document.getElementById('roomsTable');
+            const rows = Array.from(table.rows).slice(1);
+            rows.sort((a, b) => {
+                const nameA = a.cells[0].innerText.toLowerCase();
+                const nameB = b.cells[0].innerText.toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
+            rows.forEach(row => table.appendChild(row));
+        }
+
+        function sortByTime() {
+            const table = document.getElementById('roomsTable');
+            const rows = Array.from(table.rows).slice(1);
+            rows.sort((a, b) => {
+                const timeA = a.cells[1].innerText === 'Aucun cours prévu' ? Infinity : new Date('1970-01-01T' + a.cells[1].innerText);
+                const timeB = b.cells[1].innerText === 'Aucun cours prévu' ? Infinity : new Date('1970-01-01T' + b.cells[1].innerText);
+                return timeB - timeA; // Inverser l'ordre de tri
+            });
+            rows.forEach(row => table.appendChild(row));
+        }
+    </script>
+</body>
+</html>
