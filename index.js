@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const { getFreeRooms, toDate } = require('./utils');
 
+process.env.TZ = "Europe/Paris";
+
 const app = express();
 const port = 3000;
 
