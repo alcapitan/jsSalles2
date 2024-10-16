@@ -14,7 +14,7 @@ app.set('views', path.join(__dirname, 'views'));
 // Servir des fichiers statiques
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', async (req, res) => {
+app.get('/salles', async (req, res) => {
     try {
         const freeRooms = await getFreeRooms();
         const sortedRooms = Object.keys(freeRooms).sort().reduce((result, key) => {
