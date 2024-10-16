@@ -12,7 +12,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Servir des fichiers statiques
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/salles/public',express.static(path.join(__dirname, 'public')));
 
 app.get('/salles', async (req, res) => {
     try {
