@@ -5,7 +5,7 @@ const { getFreeRooms, toDate } = require('./utils');
 process.env.TZ = "Europe/Paris";
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
 // Définir le moteur de template EJS
 app.set('view engine', 'ejs');
