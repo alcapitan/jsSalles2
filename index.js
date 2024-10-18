@@ -16,12 +16,13 @@ app.use('/salles/public',express.static(path.join(__dirname, 'public')));
 
 app.get('/salles', async (req, res) => {
     try {
-        const freeRooms = await getFreeRooms();
-        const sortedRooms = Object.keys(freeRooms).sort().reduce((result, key) => {
+        const { freeRooms, usedRooms } = await getFreeRooms();
+        const sortedFreeRooms = Object.keys(freeRooms).sort().reduce((result, key) => {
             result[key] = freeRooms[key];
             return result;
         }, {});
-        res.render('index', { freeRooms: sortedRooms, toDate });
+
+        res.render('index', { freeRooms: sortedFreeRooms, toDate });
     } catch (error) {
         res.status(500).json({ error: 'Erreur lors de la récupération des salles libres' });
     }
