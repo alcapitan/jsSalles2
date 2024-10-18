@@ -149,6 +149,7 @@ function whenWillItBeFree(courses) {
         console.warn('Invalid usedCourse data:', course);
         return;
     }
+    
 
     for (const course of courses) {
         if (!course || !course.dtstart || !course.dtend) {
@@ -161,6 +162,7 @@ function whenWillItBeFree(courses) {
 
         // La salle est occupée
         if (courseStart < now && courseEnd > now) {
+            
             
         }
     }
