@@ -30,7 +30,28 @@
             </tbody>
         </table>
     </div>
+    <div class="container">
+        <h1>Salles Occupées</h1>
+        <table id="roomsTable">
+            <thead>
+                <tr>
+                    <th>Salle</th>
+                    <th>Sera Libre</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (const room in usedRooms) { %>
+                    <tr>
+                        <td><%= room %></td>
+                        <td><%= usedRooms[room].courses.willBeFree ? new Date(usedRooms[room].courses.willBeFree).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', hour12: false }) : 'Aucune information' %></td>
+
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
     <script>
+        sortByTime();
         function sortByName() {
             const table = document.getElementById('roomsTable');
             const rows = Array.from(table.rows).slice(1);
@@ -48,7 +69,7 @@
             rows.sort((a, b) => {
                 const timeA = a.cells[1].innerText === 'Aucun cours prévu' ? Infinity : new Date('1970-01-01T' + a.cells[1].innerText);
                 const timeB = b.cells[1].innerText === 'Aucun cours prévu' ? Infinity : new Date('1970-01-01T' + b.cells[1].innerText);
-                return timeA - timeB; // Tri par ordre croissant
+                return timeA - timeB;
             });
             rows.forEach(row => table.appendChild(row));
         }

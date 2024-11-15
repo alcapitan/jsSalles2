@@ -8,8 +8,8 @@ function toDate(dt) {
     const minute = dt.substring(11, 13);
     const second = dt.substring(13, 15);
     const eventDate = new Date(Date.UTC(year, month, day, hour, minute, second));
-
     return eventDate;
+
 }
 
 function getClassCourses(url) {
@@ -119,6 +119,7 @@ const roomsData = JSON.parse(fs.readFileSync(roomsFilePath, 'utf8'));
 
 async function getFreeRooms() {
     let freeRooms = {};
+    let usedRooms = {};
     const promises = roomsData.rooms.map(async (room) => {
         if (room.url == undefined) {
             console.log(room);
@@ -130,6 +131,9 @@ async function getFreeRooms() {
             const classStatus = isClassFree(courses);
             if (classStatus.free) {
                 freeRooms[room.name] = classStatus;
+            } else {
+                usedRooms[room.name] = classStatus;
+                usedRooms[room.name].courses.willBeFree = whenWillItBeFree(usedRooms[room.name].courses)
             }
         } catch (error) {
             console.error('Error:', error);
@@ -137,7 +141,28 @@ async function getFreeRooms() {
     });
 
     await Promise.all(promises);
-    return freeRooms;
+    return { freeRooms, usedRooms };
+}
+
+function whenWillItBeFree(courses) {
+    const now = new Date();
+    let willBeFree = null;
+    if( courses.length == 0) {
+        console.warn('Invalid usedCourse data:', course);
+        return;
+    }
+    
+    for (const course of courses) {
+        if (!course || !course.dtstart || !course.dtend) {
+            console.warn('Invalid course data:', course);
+            continue;
+        }
+
+        const courseStart = toDate(course.dtstart);
+        const courseEnd = toDate(course.dtend);
+        if(courseEnd == null || courseEnd > willBeFree) willBeFree = courseEnd;
+    }
+    return willBeFree;
 }
 
 module.exports = {
