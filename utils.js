@@ -146,12 +146,12 @@ async function getFreeRooms() {
 
 function whenWillItBeFree(courses) {
     const now = new Date();
+    let willBeFree = null;
     if( courses.length == 0) {
         console.warn('Invalid usedCourse data:', course);
         return;
     }
     
-
     for (const course of courses) {
         if (!course || !course.dtstart || !course.dtend) {
             console.warn('Invalid course data:', course);
@@ -160,12 +160,9 @@ function whenWillItBeFree(courses) {
 
         const courseStart = toDate(course.dtstart);
         const courseEnd = toDate(course.dtend);
-
-        // La salle est occupée
-        if (courseStart < now && courseEnd > now) {
-            return courseEnd;
-        }
+        if(courseEnd == null || courseEnd > willBeFree) willBeFree = courseEnd;
     }
+    return willBeFree;
 }
 
 module.exports = {
