@@ -17,12 +17,18 @@ app.use('/salles/public',express.static(path.join(__dirname, 'public')));
 app.get('/salles', async (req, res) => {
     try {
         const { freeRooms, usedRooms } = await getFreeRooms();
+        // for(const room in usedRooms) {
+        //     console.log(toDate(usedRooms[room].courses.willBeFree));
+        // }
         const sortedFreeRooms = Object.keys(freeRooms).sort().reduce((result, key) => {
             result[key] = freeRooms[key];
             return result;
         }, {});
-
-        res.render('index', { freeRooms: sortedFreeRooms, toDate });
+        const sortedUsedRooms = Object.keys(usedRooms).sort().reduce((result, key) => {
+            result[key] = usedRooms[key];
+            return result;
+        }, {});
+        res.render('index', { freeRooms: sortedFreeRooms, usedRooms: sortedUsedRooms, toDate });
     } catch (error) {
         res.status(500).json({ error: 'Erreur lors de la récupération des salles libres' });
     }

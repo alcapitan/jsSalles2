@@ -8,8 +8,8 @@ function toDate(dt) {
     const minute = dt.substring(11, 13);
     const second = dt.substring(13, 15);
     const eventDate = new Date(Date.UTC(year, month, day, hour, minute, second));
-
     return eventDate;
+
 }
 
 function getClassCourses(url) {
@@ -145,6 +145,7 @@ async function getFreeRooms() {
 }
 
 function whenWillItBeFree(courses) {
+    const now = new Date();
     if( courses.length == 0) {
         console.warn('Invalid usedCourse data:', course);
         return;
@@ -162,8 +163,7 @@ function whenWillItBeFree(courses) {
 
         // La salle est occupée
         if (courseStart < now && courseEnd > now) {
-            
-            
+            return courseEnd;
         }
     }
 }
