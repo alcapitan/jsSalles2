@@ -1,54 +1,75 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Salles Libres</title>
-    <link rel="stylesheet" href="/salles/public/styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container">
-        <h1>Salles Libres</h1>
-        <div class="buttons">
-            <button onclick="sortByName()">Trier par nom</button>
-            <button onclick="sortByTime()">Trier par heure</button>
-        </div>
-        <table id="roomsTable">
-            <thead>
-                <tr>
-                    <th>Salle</th>
-                    <th>Prochain cours</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% for (const room in freeRooms) { %>
-                    <tr>
-                        <td><%= room %></td>
-                        <td><%= freeRooms[room].nextCourse ? new Date(toDate(freeRooms[room].nextCourse.dtstart)).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', hour12: false }) : 'Aucun cours prévu' %></td>
-                    </tr>
-                <% } %>
-            </tbody>
-        </table>
-    </div>
-    <div class="container">
-        <h1>Salles Occupées</h1>
-        <table id="roomsTable">
-            <thead>
-                <tr>
-                    <th>Salle</th>
-                    <th>Sera Libre</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% for (const room in usedRooms) { %>
-                    <tr>
-                        <td><%= room %></td>
-                        <td><%= usedRooms[room].courses.willBeFree ? new Date(usedRooms[room].courses.willBeFree).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', hour12: false }) : 'Aucune information' %></td>
 
-                    </tr>
-                <% } %>
-            </tbody>
-        </table>
+<body class="h-full bg-gray-100">
+    <div class="min-h-full">
+        <header class="bg-white shadow">
+            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900">Salles libres</h1>
+            </div>
+        </header>
+        <main>
+            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                <div class="container mx-auto">
+                    <table id="roomsTable" class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salle</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prochain cours</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <% for (const room in freeRooms) { %>
+                                <tr>
+                                    <td class="px-4 py-4 whitespace-nowrap">
+                                        <%= room %>
+                                    </td>
+                                    <td class="px-4 py-4 whitespace-nowrap">
+                                        <%= freeRooms[room].nextCourse ? new
+                                            Date(toDate(freeRooms[room].nextCourse.dtstart)).toLocaleTimeString('fr-FR',
+                                            { hour: '2-digit' , minute: '2-digit' , hour12: false })
+                                            : 'Aucun cours prévu' %>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="container mx-auto mt-8">
+                    <h1 class="text-2xl font-bold mb-4">Salles Occupées</h1>
+                    <table id="roomsTable" class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salle</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sera Libre</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <% for (const room in usedRooms) { %>
+                                <tr>
+                                    <td class="px-4 py-4 whitespace-nowrap">
+                                        <%= room %>
+                                    </td>
+                                    <td class="px-4< py-4 whitespace-nowrap">
+                                        <%= usedRooms[room].courses.willBeFree ? new
+                                            Date(usedRooms[room].courses.willBeFree).toLocaleTimeString('fr-FR', {
+                                            hour: '2-digit' , minute: '2-digit' , hour12: false })
+                                            : 'Aucune information' %>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
     </div>
     <script>
         sortByTime();
@@ -75,4 +96,5 @@
         }
     </script>
 </body>
+
 </html>
