@@ -12,7 +12,8 @@ function toDate(dt) {
 
 }
 
-function getClassCourses(url) {
+function getClassCourses(url, date) {
+    let today = new Date(date);
     return axios.get(url)
         .then(response => {
             const data = response.data;
@@ -51,7 +52,6 @@ function getClassCourses(url) {
                 }
             }
 
-            const today = new Date();
             today.setHours(0, 0, 0, 0);
 
             const todayEvents = events.filter(event => {
@@ -66,7 +66,7 @@ function getClassCourses(url) {
                 return eventDate.getDate() == today.getDate() && eventDate.getMonth() == today.getMonth() && eventDate.getFullYear() == today.getFullYear();
             });
 
-            return todayEvents; // Move return statement here
+            return todayEvents;
         })
         .catch(error => {
             console.log(url);
@@ -74,11 +74,10 @@ function getClassCourses(url) {
         });
 }
 
-function isClassFree(courses) {
+function isClassFree(courses, now) {
     let nextCourse = null;
     let nextCourseDiff = null;
     if (courses.length === 0) { return { free: true, nextCourse: nextCourse }; }
-    const now = new Date();
 
     for (const course of courses) {
         if (!course || !course.dtstart || !course.dtend) {
@@ -89,26 +88,29 @@ function isClassFree(courses) {
         const courseStart = toDate(course.dtstart);
         const courseEnd = toDate(course.dtend);
 
-        // La salle est occupée
         if (courseStart < now && courseEnd > now) {
             return { free: false, courses: courses };
+
         } else if (nextCourse != null) {
-            // Si le cours est dans le futur
+
             if (courseStart > now) {
                 const diff = courseStart - toDate(nextCourse.dtstart);
+
                 if (diff < nextCourseDiff) {
                     nextCourseDiff = diff;
                     nextCourse = course;
                 }
             }
+
         } else if (nextCourse == null) {
+            
             if (courseStart > now) {
                 nextCourseDiff = courseStart - now;
                 nextCourse = course;
             }
         }
     }
-
+    
     return { free: true, nextCourse: nextCourse };
 }
 
@@ -117,7 +119,14 @@ const path = require('path');
 const roomsFilePath = path.join(__dirname, 'rooms.json');
 const roomsData = JSON.parse(fs.readFileSync(roomsFilePath, 'utf8'));
 
-async function getFreeRooms() {
+async function getFreeRooms(queryDate, queryHeure) {
+    let date = null;
+    if (!queryDate || !queryHeure) {
+        date = new Date();
+    } else {
+        date = new Date(queryDate);
+        date.setHours(queryHeure.split(':')[0], queryHeure.split(':')[1]);
+    }
     let freeRooms = {};
     let usedRooms = {};
     const promises = roomsData.rooms.map(async (room) => {
@@ -127,13 +136,13 @@ async function getFreeRooms() {
             return;
         }
         try {
-            const courses = await getClassCourses(room.url);
-            const classStatus = isClassFree(courses);
+            const courses = await getClassCourses(room.url, date);
+            const classStatus = isClassFree(courses, date);
             if (classStatus.free) {
                 freeRooms[room.name] = classStatus;
             } else {
                 usedRooms[room.name] = classStatus;
-                usedRooms[room.name].courses.willBeFree = whenWillItBeFree(usedRooms[room.name].courses)
+                usedRooms[room.name].courses.willBeFree = whenWillItBeFree(usedRooms[room.name].courses);
             }
         } catch (error) {
             console.error('Error:', error);
@@ -145,7 +154,6 @@ async function getFreeRooms() {
 }
 
 function whenWillItBeFree(courses) {
-    const now = new Date();
     let willBeFree = null;
     if( courses.length == 0) {
         console.warn('Invalid usedCourse data:', course);
