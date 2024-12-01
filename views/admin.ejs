@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration de tidic.fr/salles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="h-full bg-gray-100">
+    <div class="min-h-full">
+        <header class="bg-white shadow">
+            <div class="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900">Administration de tidic.fr/salles</h1>
+            </div>
+        </header>
+        <main>
+            <div class="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+                <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+                    <h2 class="text-2xl font-bold mb-4">Statistiques de Visites</h2>
+                    <p id="totalVisits" class="text-lg">Total des visites : 0</p>
+                    <p id="monthlyVisits" class="text-lg">Visites du mois : 0</p>
+                    <p id="dailyVisits" class="text-lg">Visites d'aujourd'hui : 0</p>
+                    <canvas id="visitsChart" width="400" height="200"></canvas>
+                </div>
+
+                <div class="bg-white shadow-md rounded-lg p-6">
+                    <h2 class="text-2xl font-bold mb-4">État des Liens</h2>
+                    <table id="linksTable" class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                        <thead class="bg-gray-50 shadow-sm">
+                            <tr>
+                                <th
+                                    class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Lien</th>
+                                <th
+                                    class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200 text-center">
+                        </tbody>
+                    </table>
+                </div>
+
+                
+            </div>
+        </main>
+        <footer class="bg-white shadow mt-8">
+            <div class="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+                <p class="text-center text-sm text-gray-500">
+                    &copy; 2024 tidic.fr/salles. Tous droits réservés.
+                </p>
+            </div>
+        </footer>
+    </div>
+    <script>
+        window.visitChart = null;
+        document.addEventListener('DOMContentLoaded', async function () {
+            displayLinks();
+            displayStats(); 
+        });
+        displayStats = async () => {
+            // Exemple de données pour les visites
+            let visites = await axios.get('/salles/admin/visites').then(response => { return response.data; });
+
+            // const visites;
+            const totalVisits = Object.values(visites).reduce((acc, visite) => acc + visite, 0);
+            const today = new Date().toISOString().split('T')[0];
+            const dailyVisits = visites[today] || 0;
+            let monthlyVisits = 0;
+            const visitsPerDay = {};
+
+            for (const visite in visites) {
+                const date = new Date(visite);
+                const month = date.getMonth();
+                const day = date.getDate();
+                if (month === new Date().getMonth()) {
+                    monthlyVisits += visites[visite];
+                    visitsPerDay[day] = visites[visite];
+                }
+            }
+
+            // Afficher les statistiques de visites
+            document.getElementById('totalVisits').innerText = `Total des visites : ${totalVisits}`;
+            document.getElementById('dailyVisits').innerText = `Visites aujourd'hui : ${dailyVisits}`;
+            document.getElementById('monthlyVisits').innerText = `Visites du mois : ${monthlyVisits}`;
+            
+            const labels = Object.keys(visitsPerDay).map(day => `Jour ${day}`);
+            const data = Object.values(visitsPerDay);
+
+            const ctx = document.getElementById('visitsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Visites par jour',
+                        data: data,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        displayLinks = async () => {
+            const linksTable = document.getElementById('linksTable').getElementsByTagName('tbody')[0];
+            // Récupérer les données des liens depuis le serveur
+            const response = await axios.get('/salles/admin/rooms');
+            const links = response.data;
+
+            // Afficher l'état des liens
+            links.forEach(link => {
+                const row = linksTable.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+
+                // Nom de la salle avec le lien en hypertexte
+                const linkElement = document.createElement('a');
+                linkElement.href = link.url;
+                linkElement.textContent = link.name;
+                linkElement.target = '_blank';
+                cell1.appendChild(linkElement);
+
+                // Ajouter des classes utilitaires pour le padding et les marges
+                cell1.classList.add('px-4', 'py-2');
+                cell2.classList.add('px-4', 'py-2');
+
+                // Tester si le lien est accessible via le proxy
+                axios.get(`/salles/admin/proxy?url=${encodeURIComponent(link.url)}`)
+                    .then(response => {
+                        if (/BEGIN:VEVENT/.test(response.data)) {
+                            cell2.textContent = 'Accessible';
+                            cell2.classList.add('text-green-500');
+                        } else {
+                            cell2.textContent = 'Contenu invalide';
+                            cell2.classList.add('text-yellow-500');
+                        }
+                    })
+                    .catch(error => {
+                        cell2.textContent = 'Inaccessible';
+                        cell2.classList.add('text-red-500');
+                    });
+
+            });
+        }
+    </script>
+</body>
+
+</html>
