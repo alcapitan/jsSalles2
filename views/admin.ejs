@@ -17,11 +17,12 @@
                 <h1 class="text-3xl font-bold tracking-tight text-gray-900">Administration de tidic.fr/salles</h1>
             </div>
             <div>
-                <a href="/salles/logout" class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <a href="/salles/logout"
+                    class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     Déconnexion
                 </a>
             </div>
-            
+
         </header>
         <main>
             <div class="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
@@ -50,8 +51,6 @@
                         </tbody>
                     </table>
                 </div>
-
-                
             </div>
         </main>
         <footer class="bg-white shadow mt-8">
@@ -66,7 +65,7 @@
         window.visitChart = null;
         document.addEventListener('DOMContentLoaded', async function () {
             displayLinks();
-            displayStats(); 
+            displayStats();
         });
         displayStats = async () => {
             // Exemple de données pour les visites
@@ -93,7 +92,7 @@
             document.getElementById('totalVisits').innerText = `Total des visites : ${totalVisits}`;
             document.getElementById('dailyVisits').innerText = `Visites aujourd'hui : ${dailyVisits}`;
             document.getElementById('monthlyVisits').innerText = `Visites du mois : ${monthlyVisits}`;
-            
+
             const labels = Object.keys(visitsPerDay).map(day => `Jour ${day}`);
             const data = Object.values(visitsPerDay);
 
@@ -134,24 +133,28 @@
 
                 // Nom de la salle avec le lien en hypertexte
                 const linkElement = document.createElement('a');
-                linkElement.href = link.url;
-                linkElement.textContent = link.name;
+                linkElement.href = link.room_url;
+                linkElement.textContent = link.room_name;
                 linkElement.target = '_blank';
                 cell1.appendChild(linkElement);
+                cell2.textContent = 'pending...';
 
                 // Ajouter des classes utilitaires pour le padding et les marges
                 cell1.classList.add('px-4', 'py-2');
                 cell2.classList.add('px-4', 'py-2');
 
                 // Tester si le lien est accessible via le proxy
-                axios.get(`/salles/admin/proxy?url=${encodeURIComponent(link.url)}`)
+                axios.get(`/salles/admin/check-url?url=${encodeURIComponent(link.room_url)}`)
                     .then(response => {
-                        if (/BEGIN:VEVENT/.test(response.data)) {
+                        if (response.data.status === 'accessible') {
                             cell2.textContent = 'Accessible';
                             cell2.classList.add('text-green-500');
-                        } else {
+                        } else if (response.data.status === 'contenu invalide') {
                             cell2.textContent = 'Contenu invalide';
                             cell2.classList.add('text-yellow-500');
+                        } else {
+                            cell2.textContent = 'Inaccessible';
+                            cell2.classList.add('text-red-500');
                         }
                     })
                     .catch(error => {

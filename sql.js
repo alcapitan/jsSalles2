@@ -65,9 +65,20 @@ async function createUser(username, password) {
     }
 }
 
+async function getRooms() {
+    try {
+        const res = await client.query('SELECT room_name, room_url FROM rooms');
+        return res.rows;
+    } catch (err) {
+        console.error('Erreur lors de la récupération des salles', err);
+        throw err;
+    }
+}
+
 module.exports = {
     getVisites,
     incrementVisites,
-    checkCredentials,
     createUser,
+    checkCredentials,
+    getRooms // Ajout de la nouvelle fonction ici
 };

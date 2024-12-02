@@ -1,4 +1,9 @@
 const axios = require('axios');
+const { getRooms } = require('./sql');
+const fs = require('fs');
+const path = require('path');
+let roomsData = null;
+useGetRooms();
 
 function toDate(dt) {
     const year = dt.substring(0, 4);
@@ -69,8 +74,8 @@ function getClassCourses(url, date) {
             return todayEvents;
         })
         .catch(error => {
-            console.log(url);
-            console.error('Erreur lors de la récupération des données:', error);
+            // console.log(url);
+            // console.error('Erreur lors de la récupération des données:', error);
         });
 }
 
@@ -114,10 +119,16 @@ function isClassFree(courses, now) {
     return { free: true, nextCourse: nextCourse };
 }
 
-const fs = require('fs');
-const path = require('path');
-const roomsFilePath = path.join(__dirname, 'rooms.json');
-const roomsData = JSON.parse(fs.readFileSync(roomsFilePath, 'utf8'));
+
+
+async function useGetRooms() {
+    try {
+        roomsData = await getRooms();
+    } catch (error) {
+        roomsData = JSON.parse(fs.readFileSync(path.join(__dirname, 'rooms.json'), 'utf8'));
+        console.error('Error lors de la récupération des rooms dans la db:', error.message);
+    }
+}
 
 async function getFreeRooms(queryDate, queryHeure) {
     let date = null;
@@ -129,28 +140,30 @@ async function getFreeRooms(queryDate, queryHeure) {
     }
     let freeRooms = {};
     let usedRooms = {};
-    const promises = roomsData.rooms.map(async (room) => {
-        if (room.url == undefined) {
+    let invalidRooms = {};
+    const promises = roomsData.map(async (room) => {
+        if (room.room_url == undefined) {
             console.log(room);
             console.error('Error: URL not defined for room:', room);
             return;
         }
         try {
-            const courses = await getClassCourses(room.url, date);
+            const courses = await getClassCourses(room.room_url, date);
             const classStatus = isClassFree(courses, date);
             if (classStatus.free) {
-                freeRooms[room.name] = classStatus;
+                freeRooms[room.room_name] = classStatus;
             } else {
-                usedRooms[room.name] = classStatus;
-                usedRooms[room.name].courses.willBeFree = whenWillItBeFree(usedRooms[room.name].courses);
+                usedRooms[room.room_name] = classStatus;
+                usedRooms[room.room_name].courses.willBeFree = whenWillItBeFree(usedRooms[room.room_name].courses);
             }
         } catch (error) {
-            console.error('Error:', error);
+            // console.error('Error:', error.message);
+            invalidRooms[room.room_name] = room.room_url;
         }
     });
 
     await Promise.all(promises);
-    return { freeRooms, usedRooms };
+    return { freeRooms, usedRooms, invalidRooms };
 }
 
 function whenWillItBeFree(courses) {
