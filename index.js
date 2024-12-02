@@ -4,7 +4,7 @@ const { getFreeRooms, toDate } = require('./utils');
 const fs = require('fs');
 const { log } = require('console');
 const axios = require('axios');
-const { getVisites, incrementVisites, createUser, checkCredentials } = require('./sql');
+const { getVisites, incrementVisites, createUser, checkCredentials, getRooms } = require('./sql');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 
@@ -31,24 +31,24 @@ function authMiddleware(req, res, next) {
     }
 }
 
-app.use('/salles/public',express.static(path.join(__dirname, 'public')));
+app.use('/salles/public', express.static(path.join(__dirname, 'public')));
 
 app.get('/salles', async (req, res) => {
     incrementVisites(new Date().toISOString().split('T')[0]);
-    if(req.query.date || req.query.time) {
+    if (req.query.date || req.query.time) {
         const heureRegex = /^[0-2][0-9]:[0-5][0-9]$/;
         const dateRegex = /\d{4}-\d{2}-\d{2}/;
-        if(!heureRegex.test(req.query.time) || !dateRegex.test(req.query.date)) {
+        if (!heureRegex.test(req.query.time) || !dateRegex.test(req.query.date)) {
             res.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
             return;
         }
     }
     try {
-        
-        const { freeRooms, usedRooms } = await getFreeRooms(req.query.date, req.query.time);
-        res.render('index', { freeRooms, usedRooms, toDate });
+
+        const { freeRooms, usedRooms, invalidRooms } = await getFreeRooms(req.query.date, req.query.time);
+        res.render('index', { freeRooms, usedRooms, toDate, invalidRooms});
     } catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la récupération des salles libres' });
+        res.status(500).json({ error: 'Erreur lors de la récupération des salles libres: ' + error });
     }
 });
 
@@ -74,38 +74,32 @@ app.get('/salles/logout', (req, res) => {
 
 app.get('/salles/admin', authMiddleware, async (req, res) => {
     try {
-        const { freeRooms, usedRooms } = await getFreeRooms();
         res.render('admin', { getVisites });
     } catch (error) {
         console.error('Erreur lors de la récupération des données:', error);
         res.status(500).json({ error: 'Erreur lors de la récupération des salles libres' });
     }
 });
+
 app.get('/salles/admin/rooms', async (req, res) => {
-    const roomsFilePath = path.join(__dirname, 'rooms.json');
-    const roomsData = JSON.parse(fs.readFileSync(roomsFilePath, 'utf8'));
+    let roomsData = null;
+    try {
+        roomsData = await getRooms();
+    } catch (error) {
+        roomsData = JSON.parse(fs.readFileSync(path.join(__dirname, 'rooms.json'), 'utf8'));
+    }
 
-    const linkStatuses = await Promise.all(roomsData.rooms.map(async (room) => {
-        try {
-            const response = await axios.get(room.url);
-            const isValidContent = /BEGIN:VEVENT/.test(response.data);
-            return { url: room.url, name: room.name, status: isValidContent ? 'accessible' : 'contenu invalide' };
-        } catch (error) {
-            return { url: room.url, name: room.name, status: 'inaccessible' };
-        }
-    }));
-
-    res.json(linkStatuses);
+    res.json(roomsData);
 });
 
-app.get('/salles/admin/proxy', async (req, res) => {
+app.get('/salles/admin/check-url', async (req, res) => {
     const { url } = req.query;
     try {
         const response = await axios.get(url);
-        res.json(response.data);
+        const isValidContent = /BEGIN:VEVENT/.test(response.data);
+        res.json({ status: isValidContent ? 'accessible' : 'contenu invalide' });
     } catch (error) {
-        log('Erreur lors de la récupération des données:', error);
-        res.status(500).json({ error: 'Erreur lors de la récupération des données' });
+        res.json({ status: 'inaccessible' });
     }
 });
 
