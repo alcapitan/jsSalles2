@@ -12,9 +12,14 @@
 
 <body class="h-full bg-gray-100">
     <div class="min-h-full">
-        <header class="bg-white shadow flex items-center sm:px-6 lg:px-8">
-            <div class="basis-1/2 mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
-                <h1 class="text-3xl font-bold tracking-tight text-gray-900">Administration de tidic.fr/salles</h1>
+        <header class="bg-white shadow flex items-center sm:px-6 lg:px-8 pr-4">
+            <div class="basis-1/2 mr-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900"><a href="/salles">Administration</a></h1>
+            </div>
+            <div class="mr-4">
+                <button id="toggleDarkMode" class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-800 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                    Mode Nuit
+                </button>
             </div>
             <div>
                 <a href="/salles/logout"
@@ -47,7 +52,7 @@
                                     Statut</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200 text-center">
+                        <tbody class="divide-y text-center">
                         </tbody>
                     </table>
                 </div>
@@ -61,11 +66,61 @@
             </div>
         </footer>
     </div>
+    <style>
+        .dark-mode {
+            background-color: #1a202c;
+            color: #a0aec0;
+        }
+        .dark-mode header {
+            background-color: #2d3748;
+        }
+        .dark-mode .bg-white {
+            background-color: #2d3748;
+        }
+        .dark-mode .text-gray-900 {
+            color: #a0aec0;
+        }
+        .dark-mode .border-gray-300 {
+            border-color: #4a5568;
+        }
+        .dark-mode .text-gray-700 {
+            color: #a0aec0;
+        }
+        .dark-mode .bg-gray-50, .dark-mode .text-gray-500 {
+            background-color: #465368;
+            color: #a0aec0;
+        }
+        .divide-y {
+            border-color: rgb(229 231 235);
+        }
+        .dark-mode .divide-y {
+            border-color: #4a5568;
+        }
+    </style>
     <script>
         window.visitChart = null;
         document.addEventListener('DOMContentLoaded', async function () {
             displayLinks();
             displayStats();
+            const toggleDarkMode = document.getElementById('toggleDarkMode');
+            const body = document.body;
+
+            // Check for saved user preference, if any, on load of the website
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                body.classList.add('dark-mode');
+                toggleDarkMode.textContent = 'Mode Normal';
+            }
+
+            toggleDarkMode.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                if (body.classList.contains('dark-mode')) {
+                    localStorage.setItem('darkMode', 'enabled');
+                    toggleDarkMode.textContent = 'Mode Normal';
+                } else {
+                    localStorage.setItem('darkMode', 'disabled');
+                    toggleDarkMode.textContent = 'Mode Tom';
+                }
+            });
         });
         displayStats = async () => {
             // Exemple de données pour les visites

@@ -34,15 +34,15 @@
         },
         {
             "name": "S6 = C 022",
-            "url": "https://edt-api.univ-avignon.fr/api/exportAgenda/salle/def50200e5fd940d83106b562b92d27e548c147461df0532dbf9c361efe1ba43ee3947d9a0f75db378da735b91e55d592e4d39cc7a6bb3497fd0a050365704d1875a42c11d8f8ede54e1fd78dfdc9bb8b31f6783dea343d638f501"
+            "url": "https://edt-api.univ-avignon.fr/api/expor50200e5fd940d83106b562b92d27e548c147461df0532dbf9c361efe1ba43ee3947d9a0f75db378da735b91e55d592e4d39cc7a6bb3497fd0a050365704d1875a42c11d8f8ede54e1fd78dfdc9bb8b31f6783dea343d638f501"
         },
         {
             "name": "S7 = C 032",
-            "url": "https://edt-api.univ-avignon.fr/api/exportAgenda/salle/def50200487c73c7e763386e3a18496381f5a705fff17b65d9b6a9f27ae9995d5d84eb4cd9977d128b299e50856023d5b85ff3309d9671d9b4ffb51c0269449382c7c6dda7a91260a78729fde7be90af3036aa343dbe6683f8b600"
+            "url": "https://edt-api.univ-avignon.fr/api/200487c73c7e763386e3a18496381f5a705fff17b65d9b6a9f27ae9995d5d84eb4cd9977d128b299e50856023d5b85ff3309d9671d9b4ffb51c0269449382c7c6dda7a91260a78729fde7be90af3036aa343dbe6683f8b600"
         },
         {
             "name": "S8 = C 030",
-            "url": "https://edt-api.univ-avignon.fr/api/exportAgenda/salle/def5020089f655cf4c79be8d10ab26a418a7066df998ba23ec0c057f8fda6e669da64afd8deae5efafc942efe2c7ff0784497b321a6e5f514e2ac39b9ba06ec2fbccf4152489bb0936ba810545e8010433fdc810fb470b76d7e856"
+            "url": "https://edt-api.univ-avignon.fr/api/alle/def5020089f655cf4c79be8d10ab26a418a7066df998ba23ec0c057f8fda6e669da64afd8deae5efafc942efe2c7ff0784497b321a6e5f514e2ac39b9ba06ec2fbccf4152489bb0936ba810545e8010433fdc810fb470b76d7e856"
         },
         {
             "name": "STAT 1 = info - C 137",
@@ -50,7 +50,7 @@
         },
         {
             "name": "STAT 2 = info - C 136",
-            "url": "https://edt-api.univ-avignon.fr/api/exportAgenda/salle/def5020077a7e6170d80d404beb6531acc2e412d6b6eff9824fb96e73907d05f99610662522151c7ba3199284cce9f821f55930deb12db87626e4d45c48f7c7167ebdcea0331d0b2dbbb23ebb27993e70f9ac28864f3f06b0aaf1345e219"
+            "url": "https://edt-api.univ-avignon.fr/api/exportAgenda/salle/def5020076b6eff9824fb96e73907d05f99610662522151c7ba3199284cce9f821f55930deb12db87626e4d45c48f7c7167ebdcea0331d0b2dbbb23ebb27993e70f9ac28864f3f06b0aaf1345e219"
         },
         {
             "name": "STAT 3 = info - C 135",
@@ -58,7 +58,7 @@
         },
         {
             "name": "STAT 4 = info - C 131",
-            "url": "https://edt-api.univ-avignon.fr/api/exportAgenda/salle/def502004f108f7fa5382913ff33a6595dc034d9ae2c5bc3476f3fed2f7afcb0d9d8a5308d3865d8be288e2c4b695fb817ab5201ed64b0de9733da016846c69531994d60af559fcee21cbe3dd66a52959d69c15f2b11e06711e45fa0fb90"
+            "url": "https://edt-api.univ-avignlle/def502004f108f7fa5382913ff33a6595dc034d9ae2c5d8a5308d3865d8be288e2c4b695fb817ab5201ed64b0de9733da016846c69531994d60af559fcee21cbe3dd66a52959d69c15f2b11e06711e45fa0fb90"
         },
         {
             "name": "STAT 5 = info - C 130",
@@ -66,7 +66,7 @@
         },
         {
             "name": "STAT 6 = info - C 129",
-            "url": "https://edt-api.univ-avignon.fr/api/exportAgenda/salle/def5020032fb27aa42c28080ff22254e7a566585a283596e038e13526f385d778a87eff086ee962165260bf6b175322942c5b326e83f19ad221fdb26fed7328608bca9cdac831dcdb55661d39f86a073b523421c5f1f88d1a0e866d3346e"
+            "url": "https://edt-api.univ-avignlle/def5020032fb27aa42c28080ff22254e7a566585a283596e038e13526f385d778a87eff086ee962165260bf6b175322942c5b326e83f19ad221fdb26fed7328608bca9cdac831dcdb55661d39f86a073b523421c5f1f88d1a0e866d3346e"
         },
         {
             "name": "STAT 7 = info - C 128",
@@ -78,7 +78,7 @@
         },
         {
             "name": "STAT 9 = info - C 026",
-            "url": "https://edt-api.univ-avignon.fr/api/exportAgenda/salle/def50200959cb87d3b45a18cacc45e0ecfdac63c28ab9af5ce050e7b25dfc26ca7dab5f2977ca1177c4cdd5280391f8e16b573f3289baa0a8ebaaf08e60597aa46389d50cbac1083d749ed2cf4ff25e8c8e25270b07a51bca2c011d7bc4b"
+            "url": "https://edt-api.univ-avignon.fr/api/exportAgenda/salle/def50200cc45e0ecfdac63c28ab9af5ce050e7b25dfc26ca7dab5f2977ca1177c4cdd5280391f8e16b573f3289baa0a8ebaaf08e60597aa46389d50cbac1083d749ed2cf4ff25e8c8e25270b07a51bca2c011d7bc4b"
         }
     ]
 }
