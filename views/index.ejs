@@ -5,19 +5,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Salles Libres</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/salles/public/style.css" rel="stylesheet" />
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const menuButton = document.getElementById('menu-button');
             const menu = document.getElementById('menu');
+            const mobileMenuButton = document.querySelector('.lg\\:hidden button');
+            const mobileMenu = document.querySelector('.lg\\:hidden[role="dialog"]');
+            const closeButton = mobileMenu.querySelector('button');
 
             menuButton.addEventListener('click', function () {
                 menu.classList.toggle('hidden');
             });
+
             document.addEventListener('click', function (event) {
                 if (!menu.contains(event.target) && !menuButton.contains(event.target)) {
                     menu.classList.add('hidden');
                 }
+            });
+
+            mobileMenuButton.addEventListener('click', function () {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            closeButton.addEventListener('click', function () {
+                mobileMenu.classList.add('hidden');
             });
 
             const dateInput = document.getElementById('date');
@@ -35,7 +47,7 @@
                 event.preventDefault();
                 const date = document.getElementById('date').value;
                 const time = document.getElementById('time').value;
-                window.location.href = `/salles?date=${date}&time=${time}`;
+                window.location.href = `/salles/univ/<%= univ %>?date=${date}&time=${time}`;
             });
         });
     </script>
@@ -44,8 +56,57 @@
 <body class="h-full bg-gray-100">
     <div class="min-h-full">
         <header class="bg-white shadow">
-            <div class="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
-                <h1 class="text-3xl font-bold tracking-tight text-gray-900">Ou puis-je travailler ?</h1>
+            <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+                <div class="flex lg:flex-1">
+                    <h1 class="text-3xl font-bold tracking-tight text-gray-900">
+                        <%= univ == "ceri" ? "CERI - AVIGNON" : univ.toUpperCase() %>
+                    </h1>
+                </div>
+                <div class="flex lg:hidden">
+                    <button type="button"
+                        class="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                            aria-hidden="true" data-slot="icon">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="hidden lg:flex lg:gap-x-12">
+                    <a href="/salles/univ/ceri" class="text-sm/6 font-semibold text-gray-900 hover:text-indigo-600">Ceri</a>
+                    <a href="/salles/univ/agroscience" class="text-sm/6 font-semibold text-gray-900 hover:text-indigo-600">Agroscience</a>
+                    <a href="/salles/univ/avignon-centre" class="text-sm/6 font-semibold text-gray-900 hover:text-indigo-600">Avignon-Centre</a>
+                </div>
+            </nav>
+            <!-- Mobile menu, show/hide based on menu open state. -->
+            <div class="lg:hidden hidden" role="dialog" aria-modal="true">
+                <!-- Background backdrop, show/hide based on slide-over state. -->
+                <div class="fixed inset-0 z-10"></div>
+                <div
+                    class="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+                    <div class="flex items-center justify-between">
+                        <h1 class="text-3xl font-bold tracking-tight text-gray-900">
+                            <%= univ.toUpperCase() %>
+                        </h1>
+                        <button type="button" class="-m-2.5 rounded-md p-2.5 text-gray-700">
+                            <span class="sr-only">Close menu</span>
+                            <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                aria-hidden="true" data-slot="icon">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="mt-6 flow-root">
+                        <div class="-my-6 divide-y divide-gray-500/10">
+                            <div class="space-y-2 py-6">
+                                <a href="/salles/univ/ceri" class="block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">Ceri</a>
+                                <a href="/salles/univ/agroscience" class="block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">Agroscience</a>
+                                <a href="/salles/univ/avignon-centre" class="block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">Avignon-Centre</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
         <main>
@@ -93,7 +154,7 @@
                         <div class="col-span-2">
                             <button type="button"
                                 class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                onclick="window.location.href = `/salles`;">
+                                onclick="window.location.href = `/salles/univ/<%= univ %>`;">
                                 Heure actuelle
                             </button>
                         </div>
@@ -159,22 +220,26 @@
                         </tbody>
                     </table>
                 </div>
-                <% if (Object.keys(invalidRooms).length > 0) { %>
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4" role="alert">
-                    <strong class="font-bold">Erreur:</strong>
-                    <span class="block sm:inline">Les salles suivantes ont des liens invalides:</span>
-                    <ul class="list-disc list-inside">
-                        <% for (const room in invalidRooms) { %>
-                            <li><%= room %></li>
-                        <% } %>
-                    </ul>
-                </div>
-                <% } %>
-                <p class="mt-2 text-base text-gray-600 mt-6">
-                    <strong>Vous avez besoin d'une salle pour travailler ?</strong> <br>
-                    Utilisez cette page pour trouver des salles libres et savoir quand elles seront disponibles. <br>
-                    Sélectionnez une date et une heure pour voir les salles disponibles à ce moment-là.
-                </p>
+                <% if (Object.keys(invalidRooms).length> 0) { %>
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4"
+                        role="alert">
+                        <strong class="font-bold">Erreur:</strong>
+                        <span class="block sm:inline">Les salles suivantes ont des liens invalides:</span>
+                        <ul class="list-disc list-inside">
+                            <% for (const room in invalidRooms) { %>
+                                <li>
+                                    <%= room %>
+                                </li>
+                                <% } %>
+                        </ul>
+                    </div>
+                    <% } %>
+                        <p class="mt-2 text-base text-gray-600 mt-6">
+                            <strong>Vous avez besoin d'une salle pour travailler ?</strong> <br>
+                            Utilisez cette page pour trouver des salles libres et savoir quand elles seront disponibles.
+                            <br>
+                            Sélectionnez une date et une heure pour voir les salles disponibles à ce moment-là.
+                        </p>
             </div>
 
         </main>

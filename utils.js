@@ -3,7 +3,6 @@ const { getRooms } = require('./sql');
 const fs = require('fs');
 const path = require('path');
 let roomsData = null;
-useGetRooms();
 
 function toDate(dt) {
     const year = dt.substring(0, 4);
@@ -121,16 +120,21 @@ function isClassFree(courses, now) {
 
 
 
-async function useGetRooms() {
+async function useGetRooms(univ) {
+    if(!univ) {
+        console.error('Error: univ not defined');
+        return;
+    }
     try {
-        roomsData = await getRooms();
+        roomsData = await getRooms(univ);
     } catch (error) {
         roomsData = JSON.parse(fs.readFileSync(path.join(__dirname, 'rooms.json'), 'utf8'));
         console.error('Error lors de la récupération des rooms dans la db:', error.message);
     }
 }
 
-async function getFreeRooms(queryDate, queryHeure) {
+async function getFreeRooms(queryDate, queryHeure, univ) {
+    await useGetRooms(univ);
     let date = null;
     if (!queryDate || !queryHeure) {
         date = new Date();
