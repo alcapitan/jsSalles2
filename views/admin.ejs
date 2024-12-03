@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administration de tidic.fr/salles</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/salles/public/style.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -18,7 +18,7 @@
             </div>
             <div class="mr-4">
                 <button id="toggleDarkMode" class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-800 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                    Mode Nuit
+                    Mode Tom
                 </button>
             </div>
             <div>
@@ -46,10 +46,16 @@
                             <tr>
                                 <th
                                     class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Lien</th>
+                                    Université
+                                </th>
                                 <th
                                     class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Statut</th>
+                                    Lien
+                                </th>
+                                <th
+                                    class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Statut
+                                </th>
                             </tr>
                         </thead>
                         <tbody class="divide-y text-center">
@@ -177,21 +183,26 @@
         displayLinks = async () => {
             const linksTable = document.getElementById('linksTable').getElementsByTagName('tbody')[0];
             // Récupérer les données des liens depuis le serveur
-            const response = await axios.get('/salles/admin/rooms');
+            const response = await axios.get(`/salles/admin/rooms`);
             const links = response.data;
 
             // Afficher l'état des liens
             links.forEach(link => {
                 const row = linksTable.insertRow();
-                const cell1 = row.insertCell(0);
-                const cell2 = row.insertCell(1);
+                const cell0 = row.insertCell(0);
+                const cell1 = row.insertCell(1);
+                const cell2 = row.insertCell(2);
 
                 // Nom de la salle avec le lien en hypertexte
-                const linkElement = document.createElement('a');
-                linkElement.href = link.room_url;
-                linkElement.textContent = link.room_name;
-                linkElement.target = '_blank';
-                cell1.appendChild(linkElement);
+                const linkElement1 = document.createElement('a')
+                linkElement1.href = link.room_url;
+                linkElement1.textContent = link.room_name;
+                linkElement1.target = '_blank';
+                const linkElement0 = document.createElement('a');
+                linkElement0.textContent = link.univ;
+                linkElement0.target = '_blank';
+                cell0.appendChild(linkElement0);
+                cell1.appendChild(linkElement1);
                 cell2.textContent = 'pending...';
 
                 // Ajouter des classes utilitaires pour le padding et les marges

@@ -65,12 +65,38 @@ async function createUser(username, password) {
     }
 }
 
-async function getRooms() {
+async function getRooms(univ) {
+    if (!univ) {
+        try {
+            const res = await client.query('SELECT univ, room_name, room_url FROM rooms');
+            return res.rows;
+        } catch (err) {
+            console.error('Erreur lors de la récupération des salles', err);
+            throw err;
+        }
+    }
+    dbUnivs = (await getUniv()).map(u => u.univ);
+    if (!dbUnivs.includes(univ)) {
+        console.log('univ: ', univ);
+        console.log('dbUnivs: ', dbUnivs);
+        console.error('Erreur: université non trouvée');
+        throw new Error('université non trouvée');
+    }
     try {
-        const res = await client.query('SELECT room_name, room_url FROM rooms');
+        const res = await client.query('SELECT univ, room_name, room_url FROM rooms WHERE univ = $1', [univ]);
         return res.rows;
     } catch (err) {
         console.error('Erreur lors de la récupération des salles', err);
+        throw err;
+    }
+}
+
+async function getUniv() {
+    try {
+        const res = await client.query('SELECT DISTINCT univ FROM rooms;');
+        return res.rows;
+    } catch (err) {
+        console.error('Erreur lors de la récupération des universités', err);
         throw err;
     }
 }
@@ -80,5 +106,6 @@ module.exports = {
     incrementVisites,
     createUser,
     checkCredentials,
-    getRooms // Ajout de la nouvelle fonction ici
+    getRooms,
+    getUniv
 };

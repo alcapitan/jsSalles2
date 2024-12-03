@@ -4,7 +4,7 @@ const { getFreeRooms, toDate } = require('./utils');
 const fs = require('fs');
 const { log } = require('console');
 const axios = require('axios');
-const { getVisites, incrementVisites, createUser, checkCredentials, getRooms } = require('./sql');
+const { getVisites, incrementVisites, checkCredentials, getRooms, getUniv } = require('./sql');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 
@@ -18,10 +18,11 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
-    secret: 'your_secret_key',
+    secret: 'timefield',
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false } // Note: Set secure to true if using HTTPS
+    saveUninitialized: false,
+    rolling: true,
+    cookie: { secure: false, maxAge: 60*1000 } // Note: Set secure to true if using HTTPS
 }));
 function authMiddleware(req, res, next) {
     if (req.session.loggedIn) {
@@ -31,27 +32,11 @@ function authMiddleware(req, res, next) {
     }
 }
 
-app.use('/salles/public', express.static(path.join(__dirname, 'public')));
-
-app.get('/salles', async (req, res) => {
-    incrementVisites(new Date().toISOString().split('T')[0]);
-    if (req.query.date || req.query.time) {
-        const heureRegex = /^[0-2][0-9]:[0-5][0-9]$/;
-        const dateRegex = /\d{4}-\d{2}-\d{2}/;
-        if (!heureRegex.test(req.query.time) || !dateRegex.test(req.query.date)) {
-            res.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
-            return;
-        }
-    }
-    try {
-
-        const { freeRooms, usedRooms, invalidRooms } = await getFreeRooms(req.query.date, req.query.time);
-        res.render('index', { freeRooms, usedRooms, toDate, invalidRooms});
-    } catch (error) {
-        res.status(500).json({ error: 'Erreur lors de la récupération des salles libres: ' + error });
-    }
-});
-
+/**
+ * #####################
+ * Section Authenfication
+ * #####################
+ */
 app.get('/salles/login', (req, res) => {
     res.render('login');
 });
@@ -72,6 +57,15 @@ app.get('/salles/logout', (req, res) => {
     res.redirect('/salles/');
 });
 
+
+
+
+
+/**
+ * ######################
+ * Section Administration
+ * ######################
+ */
 app.get('/salles/admin', authMiddleware, async (req, res) => {
     try {
         res.render('admin', { getVisites });
@@ -113,7 +107,61 @@ app.get('/salles/admin/visites', async (req, res) => {
     }
 });
 
+/**
+ * ################
+ * Section Publique
+ * ################
+ */
+app.use('/salles/public', express.static(path.join(__dirname, 'public')));
 
+app.get('/salles', async (req, res) => {
+    // incrementVisites(new Date().toISOString().split('T')[0]);
+    res.redirect('/salles/univ/ceri');
+});
+
+app.get('/salles/univ/:univ', async (req, res) => {
+    const univs = (await getUniv(req.params.univ)).map(u => u.univ);
+    const univ = req.params.univ;
+    if(!univs.includes(univ)) {
+        console.log('Université non trouvée');
+        res.status(404).send('Université non trouvée');
+        return;
+    }
+    if (!req.session.visited) {
+        try {
+            await incrementVisites(new Date().toISOString().split('T')[0]);
+            req.session.visited = true; // Marquer l'utilisateur comme compté
+        } catch (error) {
+            console.error('Erreur lors de l\'incrémentation des visites', error);
+        }
+    }
+    if (req.query.date || req.query.time) {
+        const heureRegex = /^[0-2][0-9]:[0-5][0-9]$/;
+        const dateRegex = /\d{4}-\d{2}-\d{2}/;
+        if (!heureRegex.test(req.query.time) || !dateRegex.test(req.query.date)) {
+            res.redirect('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+            return;
+        }
+    }
+    try {
+        const { freeRooms, usedRooms, invalidRooms } = await getFreeRooms(req.query.date, req.query.time, univ);        
+        res.render('index', { freeRooms, usedRooms, toDate, invalidRooms, univ: univ });
+    } catch (error) {
+        res.status(500).json({ error: 'Erreur lors de la récupération des salles libres: ' + error });
+    }
+});
+
+// 404 page
+app.use((req, res) => {
+    // snd 404.html
+    res.status(404).render(path.join(__dirname, 'views', '404.ejs'));
+});
+
+/**
+ * ####################
+ * Demarrage du serveur
+ * ####################
+ */
 app.listen(port, () => {
     console.log(`Serveur en écoute sur le port ${port}`);
 });
