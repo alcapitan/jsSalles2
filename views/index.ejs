@@ -7,6 +7,25 @@
     <title>Salles Libres</title>
     <link href="/salles/public/style.css" rel="stylesheet" />
     <script>
+        let currentIndex = 0;
+        document.addEventListener('keydown', function (event) {
+            const sequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyQ'];
+            console.log(event.code);
+            console.log(sequence[currentIndex]);
+            console.log(currentIndex);
+            console.log(event.code == sequence[currentIndex]);
+
+            if (event.code == sequence[currentIndex]) {
+                console.log('correct');
+                currentIndex++;
+                if (currentIndex === sequence.length) {
+                window.location.href = '/salles/login';
+                }
+            } else {
+                currentIndex = 0;
+            }
+
+        });
         document.addEventListener('DOMContentLoaded', function () {
             const menuButton = document.getElementById('menu-button');
             const menu = document.getElementById('menu');
