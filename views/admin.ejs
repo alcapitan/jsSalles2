@@ -153,8 +153,13 @@
             document.getElementById('totalVisits').innerText = `Total des visites : ${totalVisits}`;
             document.getElementById('dailyVisits').innerText = `Visites aujourd'hui : ${dailyVisits}`;
             document.getElementById('monthlyVisits').innerText = `Visites du mois : ${monthlyVisits}`;
+            const date = new Date();
+            console.log(date);
+            console.log(date.getMonth());
 
-            const labels = Object.keys(visitsPerDay).map(day => `Jour ${day}`);
+            const labels = Object.keys(visitsPerDay).map(day => {
+                return `${day}/${new Date().getMonth()+1}`;
+                });
             const data = Object.values(visitsPerDay);
 
             const ctx = document.getElementById('visitsChart').getContext('2d');
