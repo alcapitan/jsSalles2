@@ -12,18 +12,32 @@ const client = new Client({
 client.connect();
 
 async function getVisites() {
+    let visitesMap = [];
     try {
-        const res = await client.query('SELECT * FROM visites');
-        let visitesMap = {};
+        const res = await client.query('SELECT * FROM visitesparutilisateur');
+        let visitesParUtilisateurMap = {};
         res.rows.forEach(row => {
             const visites_jour = new Date(row.visites_jour).toISOString().split('T')[0];
-            visitesMap[visites_jour] = row.visites;
+            visitesParUtilisateurMap[visites_jour] = row.visites;
         });
-        return visitesMap;
+        visitesMap[0] = visitesParUtilisateurMap;
     } catch (err) {
         console.error('Erreur lors de la récupération des visites', err);
         throw err;
     }
+    try {
+        const res = await client.query('SELECT * FROM visites');
+        let visites = {};
+        res.rows.forEach(row => {
+            const visites_jour = new Date(row.visites_jour).toISOString().split('T')[0];
+            visites[visites_jour] = row.visites;
+        });
+        visitesMap[1] = visites;
+    } catch (err) {
+        console.error('Erreur lors de la récupération des visites', err);
+        throw err;
+    }
+    return visitesMap;
     
 }
 
