@@ -129,51 +129,82 @@
             });
         });
         displayStats = async () => {
-            // Exemple de données pour les visites
-            let visites = await axios.get('/salles/admin/visites').then(response => { return response.data; });
+            let visitesList = await axios.get('/salles/admin/visites').then(response => { return response.data; });
+            let visitesParUtilisateur = visitesList[0];
+            let visites = visitesList[1];
 
-            // const visites;
-            const totalVisits = Object.values(visites).reduce((acc, visite) => acc + visite, 0);
+            const totalVisits = Object.values(visitesParUtilisateur).reduce((acc, visite) => acc + visite, 0);
             const today = new Date().toISOString().split('T')[0];
-            const dailyVisits = visites[today] || 0;
-            let monthlyVisits = 0;
+            const dailyVisits = visitesParUtilisateur[today] || 0;
+            let weeklyVisits = 0;
             const visitsPerDay = {};
+            let weeklyVisits2 = 0;
+            const visitsPerDay2 = {};
 
-            for (const visite in visites) {
-                const date = new Date(visite);
-                const month = date.getMonth();
-                const day = date.getDate();
-                if (month === new Date().getMonth()) {
-                    monthlyVisits += visites[visite];
-                    visitsPerDay[day] = visites[visite];
-                }
+            const last7Days = [];
+            for (let i = 13; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                last7Days.push(date.toISOString().split('T')[0]);
             }
 
-            // Afficher les statistiques de visites
+            last7Days.forEach(date => {
+                if (visitesParUtilisateur[date]) {
+                    weeklyVisits += visitesParUtilisateur[date];
+                    visitsPerDay[date] = visitesParUtilisateur[date];
+                } else {
+                    visitsPerDay[date] = 0;
+                }
+            });
+
+            const last7Days2 = [];
+            for (let i = 13; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                last7Days2.push(date.toISOString().split('T')[0]);
+            }
+
+            last7Days2.forEach(date => {
+                if (visites[date]) {
+                    weeklyVisits2 += visites[date];
+                    visitsPerDay2[date] = visites[date];
+                } else {
+                    visitsPerDay2[date] = 0;
+                }
+            });
+
             document.getElementById('totalVisits').innerText = `Total des visites : ${totalVisits}`;
             document.getElementById('dailyVisits').innerText = `Visites aujourd'hui : ${dailyVisits}`;
-            document.getElementById('monthlyVisits').innerText = `Visites du mois : ${monthlyVisits}`;
-            const date = new Date();
-            console.log(date);
-            console.log(date.getMonth());
+            document.getElementById('monthlyVisits').innerText = `Visites des 7 derniers jours : ${weeklyVisits}`;
 
-            const labels = Object.keys(visitsPerDay).map(day => {
-                return `${day}/${new Date().getMonth()+1}`;
-                });
+            const labels = last7Days.map(date => {
+                const d = new Date(date);
+                return `${d.getDate()}/${d.getMonth() + 1}`;
+            });
             const data = Object.values(visitsPerDay);
+            const data2 = Object.values(visitsPerDay2);
 
             const ctx = document.getElementById('visitsChart').getContext('2d');
             new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: 'Visites par jour',
-                        data: data,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderWidth: 1
-                    }]
+                    datasets: [
+                        {
+                            label: 'Visites par jour par utilisateurs',
+                            data: data,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Visites par jour',
+                            data: data2,
+                            borderColor: 'rgba(192, 75, 192, 1)',
+                            backgroundColor: 'rgba(192, 75, 192, 0.2)',
+                            borderWidth: 1
+                        }
+                    ]
                 },
                 options: {
                     scales: {
