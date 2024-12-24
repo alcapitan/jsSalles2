@@ -4,7 +4,7 @@ const { getFreeRooms, toDate } = require('./utils');
 const fs = require('fs');
 const { log } = require('console');
 const axios = require('axios');
-const { getVisites, incrementVisites, checkCredentials, getRooms, getUniv } = require('./sql');
+const { getVisites, incrementVisites, incrementVisites2, checkCredentials, getRooms, getUniv } = require('./sql');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 
@@ -120,6 +120,7 @@ app.get('/salles', async (req, res) => {
 });
 
 app.get('/salles/univ/:univ', async (req, res) => {
+    incrementVisites2(new Date().toISOString().split('T')[0]);
     const univs = (await getUniv(req.params.univ)).map(u => u.univ);
     const univ = req.params.univ;
     if(!univs.includes(univ)) {

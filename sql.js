@@ -41,11 +41,23 @@ async function getVisites() {
     
 }
 
-async function incrementVisites(jour) {
+async function incrementVisites2(jour) {
     try {
         const res = await client.query('UPDATE visites SET visites = visites + 1 WHERE visites_jour = $1 RETURNING *', [jour]);
         if (res.rowCount === 0) {
             await client.query('INSERT INTO visites (visites_jour, visites) VALUES ($1, 1)', [jour]);
+        }
+    } catch (err) {
+        console.error('Erreur lors de l\'incrémentation des visites', err);
+        throw err;
+    }
+}
+
+async function incrementVisites(jour) {
+    try {
+        const res2 = await client.query('UPDATE visitesparutilisateur SET visites = visites + 1 WHERE visites_jour = $1 RETURNING *', [jour]);
+        if (res2.rowCount === 0) {
+            await client.query('INSERT INTO visitesparutilisateur (visites_jour, visites) VALUES ($1, 1)', [jour]);
         }
     } catch (err) {
         console.error('Erreur lors de l\'incrémentation des visites', err);
@@ -118,6 +130,7 @@ async function getUniv() {
 module.exports = {
     getVisites,
     incrementVisites,
+    incrementVisites2,
     createUser,
     checkCredentials,
     getRooms,
