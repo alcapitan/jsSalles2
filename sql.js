@@ -2,7 +2,7 @@ const { Client } = require('pg');
 const bcrypt = require('bcrypt');
 
 const client = new Client({
-    user: 'jsSalles',
+    user: 'jssalles',
     host: 'db.tidic.fr',
     database: 'jssalles',
     password: 'xa32vc8b',
