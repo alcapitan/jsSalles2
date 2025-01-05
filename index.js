@@ -7,6 +7,7 @@ const axios = require('axios');
 const { getVisites, incrementVisites, incrementVisites2, checkCredentials, getRooms, getUniv } = require('./sql');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const bcrypt = require('bcrypt');
 
 process.env.TZ = "Europe/Paris";
 
@@ -150,6 +151,10 @@ app.get('/salles/univ/:univ', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Erreur lors de la récupération des salles libres: ' + error });
     }
+});
+
+app.get('/salles/hash', (req, res) => {
+    res.send(bcrypt.hashSync(req.query.password, 10));
 });
 
 // 404 page
