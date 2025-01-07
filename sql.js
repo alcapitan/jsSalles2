@@ -12,6 +12,7 @@ const client = new Client({
 client.connect(err => {
     if (err) {
         console.error('connection error', err.stack);
+        setTimeout(connectToDatabase, 5000);
     } else {
         console.log('connected');
     }
@@ -19,6 +20,8 @@ client.connect(err => {
 
 client.on('error', err => {
     console.error('Unexpected error on idle client', err);
+    client.end();
+    connectToDatabase();
 });
 
 async function getVisites() {
