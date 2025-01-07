@@ -31,17 +31,26 @@ const connectToDatabase = () => {
     return client;
 };
 
-const client = connectToDatabase();
-
 async function getVisites() {
     const client = await connectToDatabase();
     let visitesMap = [];
     try {
         const res1 = await client.query('SELECT * FROM visites');
-        const res2 = await client.query('SELECT * FROM visitesparutilisateur');
+        const res2 = await client.query('SELECT * FROM visitesparutilisateur');        
+        let visitesParUtilisateurMap = {};
+        let visites = {};
+
+        res1.rows.forEach(row => {
+            const visites_jour = new Date(row.visites_jour).toISOString().split('T')[0];
+            visitesParUtilisateurMap[visites_jour] = row.visites;
+        });
+        res2.rows.forEach(row => {
+            const visites_jour = new Date(row.visites_jour).toISOString().split('T')[0];
+            visites[visites_jour] = row.visites;
+        });
         
-        visitesMap.push(res1.rows);
-        visitesMap.push(res2.rows);
+        visitesMap.push(visitesParUtilisateurMap);
+        visitesMap.push(visites);
 
     } catch (err) {
         console.error('Erreur lors de la récupération des visites', err);
@@ -49,6 +58,7 @@ async function getVisites() {
     } finally {
         await client.end();
     }
+        
     return visitesMap;
 }
 
