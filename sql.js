@@ -1,30 +1,18 @@
 const { Client } = require('pg');
 const bcrypt = require('bcrypt');
 
-const client = new Client({
-    user: 'jssalles',
-    host: 'db.tidic.fr',
-    database: 'jssalles',
-    password: 'xa32vc8b',
-    port: 5432,
-});
-
-client.connect(err => {
-    if (err) {
-        console.error('connection error', err.stack);
-        setTimeout(connectToDatabase, 5000);
-    } else {
-        console.log('connected');
-    }
-});
-
-client.on('error', err => {
-    console.error('Unexpected error on idle client', err);
-    client.end();
-    connectToDatabase();
-});
+const createClient = () => {
+    return new Client({
+        user: 'jssalles',
+        host: 'db.tidic.fr',
+        database: 'jssalles',
+        password: 'xa32vc8b',
+        port: 5432,
+    });
+};
 
 const connectToDatabase = () => {
+    const client = createClient();
     client.connect(err => {
         if (err) {
             console.error('connection error', err.stack);
@@ -33,36 +21,36 @@ const connectToDatabase = () => {
             console.log('connected');
         }
     });
+
+    client.on('error', err => {
+        console.error('Unexpected error on idle client', err);
+        client.end();
+        connectToDatabase();
+    });
+
+    return client;
 };
 
+const client = connectToDatabase();
+
 async function getVisites() {
+    const client = createClient();
+    await client.connect();
     let visitesMap = [];
     try {
-        const res = await client.query('SELECT * FROM visitesparutilisateur');
-        let visitesParUtilisateurMap = {};
-        res.rows.forEach(row => {
-            const visites_jour = new Date(row.visites_jour).toISOString().split('T')[0];
-            visitesParUtilisateurMap[visites_jour] = row.visites;
-        });
-        visitesMap[0] = visitesParUtilisateurMap;
+        const res1 = await client.query('SELECT * FROM visites');
+        const res2 = await client.query('SELECT * FROM visitesparutilisateur');
+        
+        visitesMap.push(res1.rows);
+        visitesMap.push(res2.rows);
+
     } catch (err) {
         console.error('Erreur lors de la récupération des visites', err);
         throw err;
-    }
-    try {
-        const res = await client.query('SELECT * FROM visites');
-        let visites = {};
-        res.rows.forEach(row => {
-            const visites_jour = new Date(row.visites_jour).toISOString().split('T')[0];
-            visites[visites_jour] = row.visites;
-        });
-        visitesMap[1] = visites;
-    } catch (err) {
-        console.error('Erreur lors de la récupération des visites', err);
-        throw err;
+    } finally {
+        await client.end();
     }
     return visitesMap;
-    
 }
 
 async function incrementVisites2(jour) {
