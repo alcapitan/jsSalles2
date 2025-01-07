@@ -9,7 +9,17 @@ const client = new Client({
     port: 5432,
 });
 
-client.connect();
+client.connect(err => {
+    if (err) {
+        console.error('connection error', err.stack);
+    } else {
+        console.log('connected');
+    }
+});
+
+client.on('error', err => {
+    console.error('Unexpected error on idle client', err);
+});
 
 async function getVisites() {
     let visitesMap = [];
