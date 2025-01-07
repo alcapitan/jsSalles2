@@ -134,7 +134,9 @@
             let visites = visitesList[1];
 
             const totalVisits = Object.values(visitesParUtilisateur).reduce((acc, visite) => acc + visite, 0);
-            const today = new Date().toISOString().split('T')[0];
+            const tod = new Date();
+            tod.setDate(tod.getDate() - 1);
+            const today = tod.toISOString().split('T')[0];
             const dailyVisits = visitesParUtilisateur[today] || 0;
             let weeklyVisits = 0;
             const visitsPerDay = {};
