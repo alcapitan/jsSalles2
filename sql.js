@@ -66,6 +66,7 @@ async function getVisites() {
 }
 
 async function incrementVisites2(jour) {
+    console.log(jour);
     try {
         const res = await client.query('UPDATE visites SET visites = visites + 1 WHERE visites_jour = $1 RETURNING *', [jour]);
         if (res.rowCount === 0) {
