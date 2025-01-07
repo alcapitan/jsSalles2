@@ -53,7 +53,9 @@ async function getVisites() {
     return visitesMap;
 }
 
-async function incrementVisites2(jour) {
+async function incrementVisites2(jour) {    
+    const client = createClient();
+    await client.connect();
     try {
         const res = await client.query('UPDATE visites SET visites = visites + 1 WHERE visites_jour = $1 RETURNING *', [jour]);
         if (res.rowCount === 0) {
@@ -62,10 +64,14 @@ async function incrementVisites2(jour) {
     } catch (err) {
         console.error('Erreur lors de l\'incrémentation des visites', err);
         throw err;
+    } finally {
+        await client.end();
     }
 }
 
 async function incrementVisites(jour) {
+    const client = createClient();
+    await client.connect();
     try {
         const res2 = await client.query('UPDATE visitesparutilisateur SET visites = visites + 1 WHERE visites_jour = $1 RETURNING *', [jour]);
         if (res2.rowCount === 0) {
@@ -74,10 +80,14 @@ async function incrementVisites(jour) {
     } catch (err) {
         console.error('Erreur lors de l\'incrémentation des visites', err);
         throw err;
+    } finally {
+        await client.end();
     }
 }
 
 async function checkCredentials(username, password) {
+    const client = createClient();
+    await client.connect();
     try {
         const res = await client.query('SELECT * FROM users WHERE username = $1', [username]);
         if (res.rows.length > 0) {
@@ -90,20 +100,28 @@ async function checkCredentials(username, password) {
     } catch (err) {
         console.error('Erreur lors de la vérification des identifiants', err);
         throw err;
+    } finally {
+        await client.end();
     }
 }
 
 async function createUser(username, password) {
+    const client = createClient();
+    await client.connect();
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         await client.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hashedPassword]);
     } catch (err) {
         console.error('Erreur lors de la création de l\'utilisateur', err);
         throw err;
+    } finally {
+        await client.end();
     }
 }
 
 async function getRooms(univ) {
+    const client = createClient();
+    await client.connect();
     if (!univ) {
         try {
             const res = await client.query('SELECT univ, room_name, room_url FROM rooms');
@@ -111,6 +129,8 @@ async function getRooms(univ) {
         } catch (err) {
             console.error('Erreur lors de la récupération des salles', err);
             throw err;
+        } finally {
+            await client.end();
         }
     }
     dbUnivs = (await getUniv()).map(u => u.univ);
@@ -126,16 +146,22 @@ async function getRooms(univ) {
     } catch (err) {
         console.error('Erreur lors de la récupération des salles', err);
         throw err;
+    } finally {
+        await client.end();
     }
 }
 
 async function getUniv() {
+    const client = createClient();
+    await client.connect();
     try {
         const res = await client.query('SELECT DISTINCT univ FROM rooms;');
         return res.rows;
     } catch (err) {
         console.error('Erreur lors de la récupération des universités', err);
         throw err;
+    } finally {
+        await client.end();
     }
 }
 
