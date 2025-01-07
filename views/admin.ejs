@@ -149,6 +149,9 @@
             }
 
             last7Days.forEach(date => {
+                date = new Date(date);
+                date.setDate(date.getDate()-1);
+                date = date.toISOString().split('T')[0];
                 if (visitesParUtilisateur[date]) {
                     weeklyVisits += visitesParUtilisateur[date];
                     visitsPerDay[date] = visitesParUtilisateur[date];
@@ -157,15 +160,14 @@
                 }
             });
 
-            const last7Days2 = [];
-            for (let i = 13; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                last7Days2.push(date.toISOString().split('T')[0]);
-            }
+            
 
-            last7Days2.forEach(date => {
+            last7Days.forEach(date => {
+                date = new Date(date);
+                date.setDate(date.getDate()-1);
+                date = date.toISOString().split('T')[0];
                 if (visites[date]) {
+                    console.log(visites[date] + " " + date);
                     weeklyVisits2 += visites[date];
                     visitsPerDay2[date] = visites[date];
                 } else {
