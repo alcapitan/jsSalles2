@@ -24,6 +24,17 @@ client.on('error', err => {
     connectToDatabase();
 });
 
+const connectToDatabase = () => {
+    client.connect(err => {
+        if (err) {
+            console.error('connection error', err.stack);
+            setTimeout(connectToDatabase, 5000);
+        } else {
+            console.log('connected');
+        }
+    });
+};
+
 async function getVisites() {
     let visitesMap = [];
     try {
