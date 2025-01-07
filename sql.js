@@ -34,8 +34,7 @@ const connectToDatabase = () => {
 const client = connectToDatabase();
 
 async function getVisites() {
-    const client = createClient();
-    await client.connect();
+    const client = await connectToDatabase();
     let visitesMap = [];
     try {
         const res1 = await client.query('SELECT * FROM visites');
@@ -54,8 +53,7 @@ async function getVisites() {
 }
 
 async function incrementVisites2(jour) {    
-    const client = createClient();
-    await client.connect();
+    const client = await connectToDatabase();
     try {
         const res = await client.query('UPDATE visites SET visites = visites + 1 WHERE visites_jour = $1 RETURNING *', [jour]);
         if (res.rowCount === 0) {
@@ -70,8 +68,7 @@ async function incrementVisites2(jour) {
 }
 
 async function incrementVisites(jour) {
-    const client = createClient();
-    await client.connect();
+    const client = await connectToDatabase();
     try {
         const res2 = await client.query('UPDATE visitesparutilisateur SET visites = visites + 1 WHERE visites_jour = $1 RETURNING *', [jour]);
         if (res2.rowCount === 0) {
@@ -86,8 +83,7 @@ async function incrementVisites(jour) {
 }
 
 async function checkCredentials(username, password) {
-    const client = createClient();
-    await client.connect();
+    const client = await connectToDatabase();
     try {
         const res = await client.query('SELECT * FROM users WHERE username = $1', [username]);
         if (res.rows.length > 0) {
@@ -106,8 +102,7 @@ async function checkCredentials(username, password) {
 }
 
 async function createUser(username, password) {
-    const client = createClient();
-    await client.connect();
+    const client = await connectToDatabase();
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         await client.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hashedPassword]);
@@ -120,8 +115,7 @@ async function createUser(username, password) {
 }
 
 async function getRooms(univ) {
-    const client = createClient();
-    await client.connect();
+    const client = await connectToDatabase();
     if (!univ) {
         try {
             const res = await client.query('SELECT univ, room_name, room_url FROM rooms');
@@ -152,8 +146,7 @@ async function getRooms(univ) {
 }
 
 async function getUniv() {
-    const client = createClient();
-    await client.connect();
+    const client = await connectToDatabase();
     try {
         const res = await client.query('SELECT DISTINCT univ FROM rooms;');
         return res.rows;
