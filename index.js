@@ -8,6 +8,7 @@ const { getVisites, incrementVisites, incrementVisites2, checkCredentials, getRo
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
+const { SitemapStream, streamToPromise } = require('sitemap');
 
 process.env.TZ = "Europe/Paris";
 
@@ -163,6 +164,26 @@ app.use((req, res) => {
     res.status(404).render(path.join(__dirname, 'views', '404.ejs'));
 });
 
+/**
+ * ####################
+ * Section Indexation
+ * ####################
+ */
+const sitemap = new SitemapStream({ hostname: 'https://tidic.fr/salles' });
+const writeStream = createWriteStream('./public/sitemap.xml');
+
+streamToPromise(sitemap.pipe(writeStream)).then(() => console.log('Sitemap créé avec succès'));
+
+sitemap.write({ url: '/salles', changefreq: 'daily', priority: 0.8 });
+sitemap.end();
+
+app.get('/salles/sitemap.xml', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'sitemap.xml'));
+});
+
+app.get('/salles/robots.txt', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'robots.txt'));
+});
 /**
  * ####################
  * Demarrage du serveur

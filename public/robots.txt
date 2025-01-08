@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /salles/admin/
+Allow: /salles/
+Sitemap: https://tidic.fr/salles/sitemap.xml
