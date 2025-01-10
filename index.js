@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const { getFreeRooms, toDate } = require('./utils');
 const fs = require('fs');
+const { createWriteStream } = require('fs');
+
 const { log } = require('console');
 const axios = require('axios');
 const { getVisites, incrementVisites, incrementVisites2, checkCredentials, getRooms, getUniv } = require('./sql');
@@ -155,13 +157,11 @@ app.get('/salles/univ/:univ', async (req, res) => {
 });
 
 app.get('/salles/hash', (req, res) => {
+    if (!req.query.password) {
+        res.status(400).send('Veuillez fournir un mot de passe');
+        return;
+    }
     res.send(bcrypt.hashSync(req.query.password, 10));
-});
-
-// 404 page
-app.use((req, res) => {
-    // snd 404.html
-    res.status(404).render(path.join(__dirname, 'views', '404.ejs'));
 });
 
 /**
@@ -170,11 +170,21 @@ app.use((req, res) => {
  * ####################
  */
 const sitemap = new SitemapStream({ hostname: 'https://tidic.fr/salles' });
-const writeStream = createWriteStream('./public/sitemap.xml');
+const writeStream = createWriteStream(path.join(__dirname, 'public', 'sitemap.xml'));
 
-streamToPromise(sitemap.pipe(writeStream)).then(() => console.log('Sitemap créé avec succès'));
+sitemap.pipe(writeStream)
+    .on('error', (error) => {
+        console.error('Erreur lors de la création du sitemap:', error);
+    })
+    .on('finish', () => {
+        console.log('Sitemap créé avec succès');
+    });
 
-sitemap.write({ url: '/salles', changefreq: 'daily', priority: 0.8 });
+sitemap.write({ url: '/salles', changefreq: 'weekly', priority: 0.8 });
+sitemap.write({ url: '/salles/univ/ceri', changefreq: 'weekly', priority: 0.8 });
+sitemap.write({ url: '/salles/univ/agroscience', changefreq: 'weekly', priority: 0.8 });
+sitemap.write({ url: '/salles/univ/avignon-centre', changefreq: 'weekly', priority: 0.8 });
+// Ajoutez d'autres URLs si nécessaire
 sitemap.end();
 
 app.get('/salles/sitemap.xml', (req, res) => {
@@ -184,11 +194,22 @@ app.get('/salles/sitemap.xml', (req, res) => {
 app.get('/salles/robots.txt', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'robots.txt'));
 });
+
+
+
 /**
  * ####################
  * Demarrage du serveur
  * ####################
  */
+
+// 404 page
+app.use((req, res) => {
+    // snd 404.html
+    res.status(404).render(path.join(__dirname, 'views', '404.ejs'));
+});
+
+
 app.listen(port, () => {
     console.log(`Serveur en écoute sur le port ${port}`);
 });
