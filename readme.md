@@ -8,15 +8,13 @@
 
 ## Description
 
-jsSalles est une application web permettant de trouver des salles libres dans différentes universités. Elle permet également de vérifier l'état des salles et de savoir quand elles seront disponibles.
+jsSalles est une application web permettant de trouver des salles libres dans l'université d'avignon (centre, ceri et agroscience).
 
 ## Fonctionnalités
 
-- Authentification des utilisateurs
-- Affichage des salles libres et occupées
-- Vérification des liens des salles
-- Statistiques de visites
-- Mode sombre
+- Voir les salles libres a l'heure actuelle et quand est ce qu'elle seront occupé.
+- Voir les salles occupés et quand est ce qu'elle seront libre.
+- Changer la date et l'heure pour planifier.
 
 ## Licence
 
