@@ -26,7 +26,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     rolling: true,
-    cookie: { secure: false, maxAge: 60 * 1000 } // Note: Set secure to true if using HTTPS
+    cookie: { secure: false, maxAge: 10 * 60 * 1000 } // Note: Set secure to true if using HTTPS
 }));
 function authMiddleware(req, res, next) {
     if (req.session.loggedIn) {
@@ -124,13 +124,13 @@ app.get('/salles', async (req, res) => {
 });
 
 app.get('/salles/univ/:univ', async (req, res) => {
-    // incrementVisites2(new Date().toISOString().split('T')[0]);
+    incrementVisites2(new Date().toISOString().split('T')[0]);
     const univs = (await getUniv(req.params.univ)).map(u => u.univ);
     const univ = req.params.univ;
     if (!univs.includes(univ)) {
-        console.log('Université non trouvée');
-        res.status(404).send('Université non trouvée');
-        return;
+            console.log('Université non trouvée');
+            res.status(404).render(path.join(__dirname, 'views', '404.ejs'));
+            return;
     }
     if (!req.session.visited) {
         try {

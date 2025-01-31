@@ -111,7 +111,7 @@
             const toggleDarkMode = document.getElementById('toggleDarkMode');
             const body = document.body;
 
-            // Check for saved user preference, if any, on load of the website
+            // Pour activer le darkmode qui est pas beau
             if (localStorage.getItem('darkMode') === 'enabled') {
                 body.classList.add('dark-mode');
                 toggleDarkMode.textContent = 'Mode Normal';
@@ -272,5 +272,4 @@
         }
     </script>
 </body>
-
 </html>

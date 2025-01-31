@@ -3,24 +3,38 @@
 
 <head>
     <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-KWDPDBHJ');</script>
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-KWDPDBHJ');</script>
     <!-- End Google Tag Manager -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6JL94REJKC"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-6JL94REJKC');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Vous avez besoin d'une salle pour travailler ?
     Utilisez cette page pour trouver des salles libres et savoir quand elles seront disponibles.
     Sélectionnez une date et une heure pour voir les salles disponibles à ce moment-là.">
-    <meta name="keywords"
-        content="univ, université, avignon, université avignon, univ avignon, uapv, e-uapv, univ-avignon, salles, salles libres, tidic, réservation">
+    <meta name="keywords" content="univ, université, avignon, université avignon, univ avignon, uapv, e-uapv, univ-avignon, salles, salles libres, tidic, réservation">
     <meta name="robots" content="index, follow">
-    <title>Salles Libres</title>
+    <title>Trouver une Salle libre</title>
     <link href="/salles/public/style.css" rel="stylesheet" />
+    <link rel="icon" href="/salles/public/favicon.ico" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
+        // Konami code qui redirige vers la page d'administration
         let currentIndex = 0;
         document.addEventListener('keydown', function (event) {
             const sequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyQ'];
@@ -35,6 +49,8 @@
             }
 
         });
+
+        // Fonction pour la navbar lattérale sur mobile
         document.addEventListener('DOMContentLoaded', function () {
             const menuButton = document.getElementById('menu-button');
             const menu = document.getElementById('menu');
@@ -60,6 +76,7 @@
                 mobileMenu.classList.add('hidden');
             });
 
+            // JS pour le selecteur de date
             const dateInput = document.getElementById('date');
             const timeInput = document.getElementById('time');
             const now = new Date();
@@ -83,10 +100,11 @@
 
 <body class="h-full bg-gray-100 <%= univ %>">
     <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KWDPDBHJ"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KWDPDBHJ" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
     <div class="min-h-full">
+        <!-- navbar prise de tailwind ui -->
         <header class="bg-white shadow">
             <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
                 <div class="flex lg:flex-1">
@@ -149,90 +167,97 @@
         </header>
         <main>
             <div class="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
-                <div class="relative inline-block text-left w-full">
-                    <div class="grid grid-cols-5 gap-4">
-                        <div class="col-span-3 relative">
-                            <button type="button"
-                                class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                id="menu-button" aria-expanded="true" aria-haspopup="true">
-                                Sélectionner Date et Heure
-                                <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                                    fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </button>
 
-                            <div id="menu"
-                                class="absolute mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden"
-                                role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
-                                <div class="py-1" role="none">
-                                    <form id="dateTimeForm" class="px-4 py-3" role="none">
-                                        <div class="mb-4">
-                                            <label for="date"
-                                                class="block text-sm font-medium text-gray-700">Date</label>
-                                            <input type="date" id="date" name="date"
-                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                        </div>
-                                        <div class="mb-4">
-                                            <label for="time"
-                                                class="block text-sm font-medium text-gray-700">Heure</label>
-                                            <input type="time" id="time" name="time"
-                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                        </div>
-                                        <div>
-                                            <button type="submit" id="searchButton"
-                                                class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Rechercher</button>
-                                        </div>
-                                    </form>
+                <div class="content">
+                    <!-- Selecteur de date -->
+                    <div class="relative inline-block text-left w-full">
+                        <div class="grid grid-cols-5 gap-4">
+                            <div class="col-span-3 relative">
+                                <button type="button"
+                                    class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    id="menu-button" aria-expanded="true" aria-haspopup="true">
+                                    Sélectionner Date et Heure
+                                    <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                        fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd"
+                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+
+                                <div id="menu"
+                                    class="absolute mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden"
+                                    role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+                                    <div class="py-1" role="none">
+                                        <form id="dateTimeForm" class="px-4 py-3" role="none">
+                                            <div class="mb-4">
+                                                <label for="date"
+                                                    class="block text-sm font-medium text-gray-700">Date</label>
+                                                <input type="date" id="date" name="date"
+                                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                            </div>
+                                            <div class="mb-4">
+                                                <label for="time"
+                                                    class="block text-sm font-medium text-gray-700">Heure</label>
+                                                <input type="time" id="time" name="time"
+                                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                            </div>
+                                            <div>
+                                                <button type="submit" id="searchButton"
+                                                    class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Rechercher</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-span-2">
-                            <button type="button"
-                                class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                onclick="window.location.href = `/salles/univ/<%= univ %>`;">
-                                Heure actuelle
-                            </button>
+                            <div class="col-span-2">
+                                <button type="button"
+                                    class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    onclick="window.location.href = `/salles/univ/<%= univ %>`;">
+                                    Heure actuelle
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Tableau des salles libres -->
-                <div class="container mx-auto mt-6 max-w-4xl">
-                    <h1 class="text-2xl font-bold mb-4">Salles Libres</h1>
-                    <table id="freeRoomsTable" class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-                        <thead class="bg-gray-50 shadow-sm">
-                            <tr>
-                                <th
-                                    class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Salle</th>
-                                <th
-                                    class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Prochain cours</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white animate-pulse">
-                        </tbody>
-                    </table>
-                </div>
-                <div class="container mx-auto mt-8 max-w-4xl">
-                    <h1 class="text-2xl font-bold mb-4">Salles Occupées</h1>
-                    <table id="usedRoomsTable" class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Salle
-                                </th>
-                                <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Sera
-                                    Libre</th>
-                            </tr>
-                        </thead>
-                        <tbody class="used-rooms-table bg-white animate-pulse">
-                        </tbody>
-                    </table>
-                </div>
+                    <!-- Tableau des salles libres -->
+                    <div class="container mx-auto mt-6 max-w-4xl">
+                        <h1 class="text-2xl font-bold mb-4">Salles Libres</h1>
+                        <table id="freeRoomsTable" class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                            <thead class="bg-gray-50 shadow-sm">
+                                <tr>
+                                    <th
+                                        class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Salle</th>
+                                    <th
+                                        class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Prochain cours</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white animate-pulse">
+                            </tbody>
+                        </table>
+                    </div>
 
+                    <!-- Tableau des salles occupées -->
+                    <div class="container mx-auto mt-8 max-w-4xl">
+                        <h1 class="text-2xl font-bold mb-4">Salles Occupées</h1>
+                        <table id="usedRoomsTable" class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Salle
+                                    </th>
+                                    <th class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Sera
+                                        Libre</th>
+                                </tr>
+                            </thead>
+                            <tbody class="used-rooms-table bg-white animate-pulse">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Texte d'explication -->
                 <p class="mt-2 text-base text-gray-600 mt-6">
                     <strong>Vous avez besoin d'une salle pour travailler ?</strong> <br>
                     Utilisez cette page pour trouver des salles libres et savoir quand elles seront disponibles.
@@ -240,7 +265,6 @@
                     Sélectionnez une date et une heure pour voir les salles disponibles à ce moment-là.
                 </p>
                 <p class="mt-2 text-base text-gray-600 mt-6">
-                    <!-- Indiquer que si on veut me contacter, on peut a l'adresse contact@tidic.fr ou tidic sur discord -->
                     <strong>Il manque une salle ? Une salle ne devrait pas être dans la liste ?</strong> <br>
                     Ou simplement, si vous avez des suggestions ou des remarques, <br>
                     Contactez-moi à l'adresse <strong><a href="mailto:contact@tidic.fr">contact@tidic.fr</a></strong> ou
@@ -248,7 +272,6 @@
 
                 </p>
             </div>
-
         </main>
         <footer class="bg-white shadow mt-8">
             <div class="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
@@ -260,10 +283,11 @@
     </div>
     <script>
         const univ = '<%= univ %>';
-        sortByTime();
-        sortByTimeDescending();
+        sortUsedRooms();
+        sortFreeRooms();
         updateTable();
 
+        // Fonction pour convertir une date au format 20210101T120000 en objet Date
         function toDate(dt) {
             const year = dt.substring(0, 4);
             const month = dt.substring(4, 6) - 1;
@@ -275,7 +299,8 @@
             return eventDate;
         }
 
-        function sortByTime() {
+        // Fonction pour trier les salles occupées par heure
+        function sortUsedRooms() {
             const table = document.getElementById('usedRoomsTable').getElementsByTagName('tbody')[0];
             const rows = Array.from(table.rows);
             rows.sort((a, b) => {
@@ -286,7 +311,9 @@
 
             rows.forEach(row => table.appendChild(row));
         }
-        function sortByTimeDescending() {
+
+        // Fonction pour trier les salles libres par heure descendante
+        function sortFreeRooms() {
             const table = document.getElementById('freeRoomsTable').getElementsByTagName('tbody')[0];
             const rows = Array.from(table.rows);
 
@@ -301,6 +328,8 @@
             });
             rows.forEach(row => table.appendChild(row));
         }
+
+        // Fonction pour ajouter un squelette de chargement, qui est affiché pendant le chargement des données a la place des salles
         function addSkeleton() {
             ["freeRoomsTable", "usedRoomsTable"].forEach(tableId => {
                 const table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
@@ -319,8 +348,11 @@
             });
         }
 
+        // Fonction pour mettre à jour les salles libres et occupées
         async function updateTable(date, time) {
-            addSkeleton();
+            // Remplace les données par le squellette de chargement
+            addSkeleton(); 
+            // On récupère les infos des salles
             const query = date && time ? `?date=${date}&time=${time}` : '';
             const response = await axios.get(`/salles/univ/${univ}/rooms${query}`);
             const result = response.data;
@@ -328,11 +360,12 @@
             const usedRooms = result.usedRooms;
             const invalidRooms = Object.values(result.invalidRooms);
 
+            // On efface le squelette de chargement
             const freeRoomsTable = document.getElementById('freeRoomsTable').getElementsByTagName('tbody')[0];
             freeRoomsTable.innerHTML = '';
             freeRoomsTable.classList.remove('animate-pulse');
             const usedRoomsTable = document.getElementById('usedRoomsTable').getElementsByTagName('tbody')[0];
-
+            // On affiche les salles libres
             for (const room of Object.keys(freeRooms)) {
                 const row = document.createElement('tr');
                 const roomCell = document.createElement('td');
@@ -341,47 +374,68 @@
                 nextClassCell.className = 'px-4 py-4 whitespace-nowrap text-center';
                 roomCell.innerText = room;
                 nextClassCell.innerText = freeRooms[room].nextCourse != null ? (new Date(toDate(freeRooms[room].nextCourse.dtstart))).toLocaleTimeString('fr-FR',
-                { hour: '2-digit' , minute: '2-digit' , hour12: false })
-                : 'Aucun cours prévu';
+                    { hour: '2-digit', minute: '2-digit', hour12: false })
+                    : 'Aucun cours prévu';
                 row.appendChild(roomCell);
                 row.appendChild(nextClassCell);
                 freeRoomsTable.appendChild(row);
             }
 
+            // On efface le squelette de chargement
             usedRoomsTable.innerHTML = '';
             usedRoomsTable.classList.remove('animate-pulse');
-            for(const room of Object.keys(usedRooms)) {
+            // On affiche les salles occupées
+            for (const room of Object.keys(usedRooms)) {
                 const row = document.createElement('tr');
                 const roomCell = document.createElement('td');
                 const nextClassCell = document.createElement('td');
                 roomCell.className = 'px-4 py-4 whitespace-nowrap text-center';
                 nextClassCell.className = 'px-4 py-4 whitespace-nowrap text-center';
                 roomCell.innerText = room;
-                
+
                 nextClassCell.innerText = usedRooms[room].willBeFree != null ? (new Date(usedRooms[room].willBeFree)).toLocaleTimeString('fr-FR',
-                { hour: '2-digit' , minute: '2-digit' , hour12: false }) : 'Aucun cours prévu';
+                    { hour: '2-digit', minute: '2-digit', hour12: false }) : 'Aucun cours prévu';
                 row.appendChild(roomCell);
                 row.appendChild(nextClassCell);
                 usedRoomsTable.appendChild(row);
             }
 
-            sortByTime();
-            sortByTimeDescending();
-        }
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const univ = '<%= univ %>';
-            const button = document.querySelector('button');
-            
-            if (univ === 'ceri') {
-                button.classList.add('bg-blue-500', 'hover:bg-blue-700');
-            } else if (univ === 'agroscience') {
-                button.classList.add('bg-red-500', 'hover:bg-red-700');
-            } else if (univ === 'avignon-centre') {
-                button.classList.add('bg-orange-500', 'hover:bg-orange-700');
+            // On affiche les salles invalides
+            if (invalidRooms.length > 0) {
+                const invalidRoomsContainer = document.createElement('div');
+                invalidRoomsContainer.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4';
+
+                const invalidRoomsTitle = document.createElement('strong');
+                invalidRoomsTitle.className = 'font-bold';
+                invalidRoomsTitle.innerText = 'Erreur:';
+                invalidRoomsContainer.appendChild(invalidRoomsTitle);
+
+                const invalidRoomsMessage = document.createElement('span');
+                invalidRoomsMessage.className = 'block sm:inline';
+                invalidRoomsMessage.innerText = ' Les salles suivantes ont un lien invalide:';
+                invalidRoomsContainer.appendChild(invalidRoomsMessage);
+
+                const invalidRoomsList = document.createElement('ul');
+                invalidRoomsList.className = 'list-disc list-inside';
+                for (const room of invalidRooms) {
+                    const listItem = document.createElement('li');
+                    listItem.innerText = room;
+                    invalidRoomsList.appendChild(listItem);
+                }
+                invalidRoomsContainer.appendChild(invalidRoomsList);
+
+                document.querySelector('.content').insertBefore(invalidRoomsContainer, document.querySelector('main').children[3]);
+            } else {
+                const invalidRoomsContainer = document.querySelector('.bg-red-100');
+                if (invalidRoomsContainer) {
+                    invalidRoomsContainer.remove();
+                }
             }
-        });
+
+            // Et enfin on les trie
+            sortUsedRooms();
+            sortFreeRooms();
+        }
     </script>
 </body>
 
