@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "tailwind:css": "postcss public/tailwind.css -o public/style.css"
+    "css": "postcss public/tailwind.css -o public/style.css"
   },
   "author": "",
   "license": "ISC",

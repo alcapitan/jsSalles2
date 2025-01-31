@@ -26,7 +26,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     rolling: true,
-    cookie: { secure: false, maxAge: 60*1000 } // Note: Set secure to true if using HTTPS
+    cookie: { secure: false, maxAge: 60 * 1000 } // Note: Set secure to true if using HTTPS
 }));
 function authMiddleware(req, res, next) {
     if (req.session.loggedIn) {
@@ -124,10 +124,10 @@ app.get('/salles', async (req, res) => {
 });
 
 app.get('/salles/univ/:univ', async (req, res) => {
-    incrementVisites2(new Date().toISOString().split('T')[0]);
+    // incrementVisites2(new Date().toISOString().split('T')[0]);
     const univs = (await getUniv(req.params.univ)).map(u => u.univ);
     const univ = req.params.univ;
-    if(!univs.includes(univ)) {
+    if (!univs.includes(univ)) {
         console.log('Université non trouvée');
         res.status(404).send('Université non trouvée');
         return;
@@ -148,9 +148,21 @@ app.get('/salles/univ/:univ', async (req, res) => {
             return;
         }
     }
+    // const { freeRooms, usedRooms, invalidRooms } = await getFreeRooms(req.query.date, req.query.time, univ);
+    res.render('index', { univ: univ, toDate });
+});
+
+app.get('/salles/univ/:univ/rooms', async (req, res) => {
+    const univs = (await getUniv(req.params.univ)).map(u => u.univ);
+    const univ = req.params.univ;
+    if (!univs.includes(univ)) {
+        console.log('Université non trouvée' + univ);
+        res.status(404).send('Université non trouvée');
+        return;
+    }
     try {
-        const { freeRooms, usedRooms, invalidRooms } = await getFreeRooms(req.query.date, req.query.time, univ);        
-        res.render('index', { freeRooms, usedRooms, toDate, invalidRooms, univ: univ });
+        const { freeRooms, usedRooms, invalidRooms } = await getFreeRooms(req.query.date, req.query.time, univ);
+        res.json({ freeRooms, usedRooms, invalidRooms });
     } catch (error) {
         res.status(500).json({ error: 'Erreur lors de la récupération des salles libres: ' + error });
     }

@@ -13,7 +13,6 @@ function toDate(dt) {
     const second = dt.substring(13, 15);
     const eventDate = new Date(Date.UTC(year, month, day, hour, minute, second));
     return eventDate;
-
 }
 
 function getClassCourses(url, date) {
@@ -158,7 +157,7 @@ async function getFreeRooms(queryDate, queryHeure, univ) {
                 freeRooms[room.room_name] = classStatus;
             } else {
                 usedRooms[room.room_name] = classStatus;
-                usedRooms[room.room_name].courses.willBeFree = whenWillItBeFree(usedRooms[room.room_name].courses);
+                usedRooms[room.room_name].willBeFree = whenWillItBeFree(usedRooms[room.room_name].courses);
             }
         } catch (error) {
             // console.error('Error:', error.message);

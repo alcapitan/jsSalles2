@@ -2,15 +2,24 @@
 <html lang="fr">
 
 <head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KWDPDBHJ');</script>
+    <!-- End Google Tag Manager -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Vous avez besoin d'une salle pour travailler ?
     Utilisez cette page pour trouver des salles libres et savoir quand elles seront disponibles.
     Sélectionnez une date et une heure pour voir les salles disponibles à ce moment-là.">
-    <meta name="keywords" content="univ, université, avignon, université avignon, univ avignon, uapv, e-uapv, univ-avignon, salles, salles libres, tidic, réservation">
+    <meta name="keywords"
+        content="univ, université, avignon, université avignon, univ avignon, uapv, e-uapv, univ-avignon, salles, salles libres, tidic, réservation">
     <meta name="robots" content="index, follow">
     <title>Salles Libres</title>
     <link href="/salles/public/style.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         let currentIndex = 0;
         document.addEventListener('keydown', function (event) {
@@ -19,7 +28,7 @@
             if (event.code == sequence[currentIndex]) {
                 currentIndex++;
                 if (currentIndex === sequence.length) {
-                window.location.href = '/salles/login';
+                    window.location.href = '/salles/admin';
                 }
             } else {
                 currentIndex = 0;
@@ -66,19 +75,23 @@
                 event.preventDefault();
                 const date = document.getElementById('date').value;
                 const time = document.getElementById('time').value;
-                window.location.href = `/salles/univ/<%= univ %>?date=${date}&time=${time}`;
+                updateTable(date, time);
             });
         });
     </script>
 </head>
 
-<body class="h-full bg-gray-100">
+<body class="h-full bg-gray-100 <%= univ %>">
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KWDPDBHJ"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <div class="min-h-full">
         <header class="bg-white shadow">
             <nav class="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
                 <div class="flex lg:flex-1">
                     <h1 class="text-3xl font-bold tracking-tight text-gray-900">
-                        <%= univ == "ceri" ? "CERI - AVIGNON" : univ.toUpperCase() %>
+                        <%= univ=="ceri" ? "CERI - AVIGNON" : univ.toUpperCase() %>
                     </h1>
                 </div>
                 <div class="flex lg:hidden">
@@ -93,9 +106,12 @@
                     </button>
                 </div>
                 <div class="hidden lg:flex lg:gap-x-12">
-                    <a href="/salles/univ/ceri" class="text-sm/6 font-semibold text-gray-900 hover:text-indigo-600">Ceri</a>
-                    <a href="/salles/univ/agroscience" class="text-sm/6 font-semibold text-gray-900 hover:text-indigo-600">Agroscience</a>
-                    <a href="/salles/univ/avignon-centre" class="text-sm/6 font-semibold text-gray-900 hover:text-indigo-600">Avignon-Centre</a>
+                    <a href="/salles/univ/ceri"
+                        class="text-sm/6 font-semibold text-gray-900 hover:text-indigo-600">Ceri</a>
+                    <a href="/salles/univ/agroscience"
+                        class="text-sm/6 font-semibold text-gray-900 hover:text-indigo-600">Agroscience</a>
+                    <a href="/salles/univ/avignon-centre"
+                        class="text-sm/6 font-semibold text-gray-900 hover:text-indigo-600">Avignon-Centre</a>
                 </div>
             </nav>
             <!-- Mobile menu, show/hide based on menu open state. -->
@@ -119,9 +135,12 @@
                     <div class="mt-6 flow-root">
                         <div class="-my-6 divide-y divide-gray-500/10">
                             <div class="space-y-2 py-6">
-                                <a href="/salles/univ/ceri" class="block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">Ceri</a>
-                                <a href="/salles/univ/agroscience" class="block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">Agroscience</a>
-                                <a href="/salles/univ/avignon-centre" class="block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">Avignon-Centre</a>
+                                <a href="/salles/univ/ceri"
+                                    class="block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">Ceri</a>
+                                <a href="/salles/univ/agroscience"
+                                    class="block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">Agroscience</a>
+                                <a href="/salles/univ/avignon-centre"
+                                    class="block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">Avignon-Centre</a>
                             </div>
                         </div>
                     </div>
@@ -194,20 +213,7 @@
                                     Prochain cours</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <% for (const room in freeRooms) { %>
-                                <tr>
-                                    <td class="px-4 py-4 whitespace-nowrap text-center">
-                                        <%= room %>
-                                    </td>
-                                    <td class="px-4 py-4 whitespace-nowrap text-center">
-                                        <%= freeRooms[room].nextCourse ? new
-                                            Date(toDate(freeRooms[room].nextCourse.dtstart)).toLocaleTimeString('fr-FR',
-                                            { hour: '2-digit' , minute: '2-digit' , hour12: false })
-                                            : 'Aucun cours prévu' %>
-                                    </td>
-                                </tr>
-                                <% } %>
+                        <tbody class="bg-white animate-pulse">
                         </tbody>
                     </table>
                 </div>
@@ -222,50 +228,25 @@
                                     Libre</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <% for (const room in usedRooms) { %>
-                                <tr>
-                                    <td class="px-4 py-4 whitespace-nowrap text-center">
-                                        <%= room %>
-                                    </td>
-                                    <td class="px-4< py-4 whitespace-nowrap text-center">
-                                        <%= usedRooms[room].courses.willBeFree ? new
-                                            Date(usedRooms[room].courses.willBeFree).toLocaleTimeString('fr-FR', {
-                                            hour: '2-digit' , minute: '2-digit' , hour12: false })
-                                            : 'Aucune information' %>
-                                    </td>
-                                </tr>
-                                <% } %>
+                        <tbody class="used-rooms-table bg-white animate-pulse">
                         </tbody>
                     </table>
                 </div>
-                <% if (Object.keys(invalidRooms).length> 0) { %>
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4"
-                        role="alert">
-                        <strong class="font-bold">Erreur:</strong>
-                        <span class="block sm:inline">Les salles suivantes ont des liens invalides:</span>
-                        <ul class="list-disc list-inside">
-                            <% for (const room in invalidRooms) { %>
-                                <li>
-                                    <%= room %>
-                                </li>
-                                <% } %>
-                        </ul>
-                    </div>
-                    <% } %>
-                        <p class="mt-2 text-base text-gray-600 mt-6">
-                            <strong>Vous avez besoin d'une salle pour travailler ?</strong> <br>
-                            Utilisez cette page pour trouver des salles libres et savoir quand elles seront disponibles.
-                            <br>
-                            Sélectionnez une date et une heure pour voir les salles disponibles à ce moment-là.
-                        </p>
-                        <p class="mt-2 text-base text-gray-600 mt-6">
-                            <!-- Indiquer que si on veut me contacter, on peut a l'adresse contact@tidic.fr ou tidic sur discord -->
-                            <strong>Il manque une salle ? Une salle ne devrait pas être dans la liste ?</strong> <br>
-                            Ou simplement, si vous avez des suggestions ou des remarques, <br>
-                            Contactez-moi à l'adresse <strong><a href="mailto:contact@tidic.fr">contact@tidic.fr</a></strong> ou sur Discord : <strong>tidic</strong>
-                            
-                        </p>
+
+                <p class="mt-2 text-base text-gray-600 mt-6">
+                    <strong>Vous avez besoin d'une salle pour travailler ?</strong> <br>
+                    Utilisez cette page pour trouver des salles libres et savoir quand elles seront disponibles.
+                    <br>
+                    Sélectionnez une date et une heure pour voir les salles disponibles à ce moment-là.
+                </p>
+                <p class="mt-2 text-base text-gray-600 mt-6">
+                    <!-- Indiquer que si on veut me contacter, on peut a l'adresse contact@tidic.fr ou tidic sur discord -->
+                    <strong>Il manque une salle ? Une salle ne devrait pas être dans la liste ?</strong> <br>
+                    Ou simplement, si vous avez des suggestions ou des remarques, <br>
+                    Contactez-moi à l'adresse <strong><a href="mailto:contact@tidic.fr">contact@tidic.fr</a></strong> ou
+                    sur Discord : <strong>tidic</strong>
+
+                </p>
             </div>
 
         </main>
@@ -278,8 +259,21 @@
         </footer>
     </div>
     <script>
+        const univ = '<%= univ %>';
         sortByTime();
         sortByTimeDescending();
+        updateTable();
+
+        function toDate(dt) {
+            const year = dt.substring(0, 4);
+            const month = dt.substring(4, 6) - 1;
+            const day = dt.substring(6, 8);
+            const hour = dt.substring(9, 11);
+            const minute = dt.substring(11, 13);
+            const second = dt.substring(13, 15);
+            const eventDate = new Date(Date.UTC(year, month, day, hour, minute, second));
+            return eventDate;
+        }
 
         function sortByTime() {
             const table = document.getElementById('usedRoomsTable').getElementsByTagName('tbody')[0];
@@ -307,6 +301,87 @@
             });
             rows.forEach(row => table.appendChild(row));
         }
+        function addSkeleton() {
+            ["freeRoomsTable", "usedRoomsTable"].forEach(tableId => {
+                const table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
+                table.innerHTML = '';
+                for (let i = 0; i < 5; i++) {
+                    const row = document.createElement('tr');
+                    const cell = document.createElement('td');
+                    cell.colSpan = 2;
+                    cell.innerHTML = '<div class="m-2 mb-0 h-10 bg-gray-200/70 rounded" ></div>';
+                    if (i === 4) {
+                        cell.innerHTML = '<div class="m-2 h-10 bg-gray-200/70 rounded" ></div>';
+                    }
+                    row.appendChild(cell);
+                    table.appendChild(row);
+                }
+            });
+        }
+
+        async function updateTable(date, time) {
+            addSkeleton();
+            const query = date && time ? `?date=${date}&time=${time}` : '';
+            const response = await axios.get(`/salles/univ/${univ}/rooms${query}`);
+            const result = response.data;
+            const freeRooms = result.freeRooms;
+            const usedRooms = result.usedRooms;
+            const invalidRooms = Object.values(result.invalidRooms);
+
+            const freeRoomsTable = document.getElementById('freeRoomsTable').getElementsByTagName('tbody')[0];
+            freeRoomsTable.innerHTML = '';
+            freeRoomsTable.classList.remove('animate-pulse');
+            const usedRoomsTable = document.getElementById('usedRoomsTable').getElementsByTagName('tbody')[0];
+
+            for (const room of Object.keys(freeRooms)) {
+                const row = document.createElement('tr');
+                const roomCell = document.createElement('td');
+                const nextClassCell = document.createElement('td');
+                roomCell.className = 'px-4 py-4 whitespace-nowrap text-center';
+                nextClassCell.className = 'px-4 py-4 whitespace-nowrap text-center';
+                roomCell.innerText = room;
+                nextClassCell.innerText = freeRooms[room].nextCourse != null ? (new Date(toDate(freeRooms[room].nextCourse.dtstart))).toLocaleTimeString('fr-FR',
+                { hour: '2-digit' , minute: '2-digit' , hour12: false })
+                : 'Aucun cours prévu';
+                row.appendChild(roomCell);
+                row.appendChild(nextClassCell);
+                freeRoomsTable.appendChild(row);
+            }
+
+            usedRoomsTable.innerHTML = '';
+            usedRoomsTable.classList.remove('animate-pulse');
+            for(const room of Object.keys(usedRooms)) {
+                const row = document.createElement('tr');
+                const roomCell = document.createElement('td');
+                const nextClassCell = document.createElement('td');
+                roomCell.className = 'px-4 py-4 whitespace-nowrap text-center';
+                nextClassCell.className = 'px-4 py-4 whitespace-nowrap text-center';
+                roomCell.innerText = room;
+                
+                nextClassCell.innerText = usedRooms[room].willBeFree != null ? (new Date(usedRooms[room].willBeFree)).toLocaleTimeString('fr-FR',
+                { hour: '2-digit' , minute: '2-digit' , hour12: false }) : 'Aucun cours prévu';
+                row.appendChild(roomCell);
+                row.appendChild(nextClassCell);
+                usedRoomsTable.appendChild(row);
+            }
+
+            sortByTime();
+            sortByTimeDescending();
+        }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const univ = '<%= univ %>';
+            const button = document.querySelector('button');
+            
+            if (univ === 'ceri') {
+                button.classList.add('bg-blue-500', 'hover:bg-blue-700');
+            } else if (univ === 'agroscience') {
+                button.classList.add('bg-red-500', 'hover:bg-red-700');
+            } else if (univ === 'avignon-centre') {
+                button.classList.add('bg-orange-500', 'hover:bg-orange-700');
+            }
+        });
     </script>
 </body>
 
