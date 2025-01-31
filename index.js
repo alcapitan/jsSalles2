@@ -1,12 +1,12 @@
 const express = require('express');
 const path = require('path');
-const { getFreeRooms, toDate } = require('./utils');
+const { getFreeRooms, toDate } = require('./js/utils');
 const fs = require('fs');
 const { createWriteStream } = require('fs');
 
 const { log } = require('console');
 const axios = require('axios');
-const { getVisites, incrementVisites, incrementVisites2, checkCredentials, getRooms, getUniv } = require('./sql');
+const { getVisites, incrementVisites, incrementVisites2, checkCredentials, getRooms, getUniv } = require('./js/sql');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
