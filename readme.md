@@ -59,14 +59,6 @@ jsSalles est une application web permettant de trouver des salles libres dans l'
 
 6. Accédez à l'application dans votre navigateur à l'adresse `http://localhost:3001/salles`.
 
-## Variables d'environnement
-
-- [DB_USER](http://_vscodecontentref_/1) : Nom d'utilisateur de la base de données PostgreSQL.
-- [DB_HOST](http://_vscodecontentref_/2) : Hôte de la base de données PostgreSQL.
-- [DB_NAME](http://_vscodecontentref_/3) : Nom de la base de données PostgreSQL.
-- [DB_PASSWORD](http://_vscodecontentref_/4) : Mot de passe de la base de données PostgreSQL.
-- [DB_PORT](http://_vscodecontentref_/5) : Port de la base de données PostgreSQL.
-
 ## Licence
 
 Ce projet est sous licence MIT. Voir le fichier LICENSE pour plus de détails.
