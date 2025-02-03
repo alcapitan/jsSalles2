@@ -450,6 +450,11 @@
                 const options = { weekday: 'long', month: 'long', day: 'numeric' };
                 date = now.toLocaleDateString('fr-FR', options);
                 time = now.toTimeString().split(' ')[0].slice(0, 5);
+            } else {
+                const now = new Date(`${date}T${time}:00`);
+                const options = { weekday: 'long', month: 'long', day: 'numeric' };
+                date = now.toLocaleDateString('fr-FR', options);
+                time = now.toTimeString().split(' ')[0].slice(0, 5);
             }
             document.getElementsByClassName('menu-button-text')[0].innerText = `${date} à ${time}`;
         }
