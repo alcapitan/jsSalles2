@@ -175,8 +175,8 @@
                             <div class="col-span-3 relative">
                                 <button type="button"
                                     class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                    id="menu-button" aria-expanded="true" aria-haspopup="true">
-                                    Sélectionner Date et Heure
+                                    id="menu-button" aria-expanded="true" aria-haspopup="true" disabled>
+                                    <div class="menu-button-text">Sélectionner Date et Heure</div>
                                     <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                         fill="currentColor" aria-hidden="true">
                                         <path fill-rule="evenodd"
@@ -213,7 +213,7 @@
                             <div class="col-span-2">
                                 <button type="button"
                                     class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-indigo-600 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                    onclick="window.location.href = `/salles/univ/<%= univ %>`;">
+                                    onclick="updateTable()">
                                     Heure actuelle
                                 </button>
                             </div>
@@ -331,6 +331,9 @@
 
         // Fonction pour ajouter un squelette de chargement, qui est affiché pendant le chargement des données a la place des salles
         function addSkeleton() {
+            const dropDown = document.getElementById('menu-button');
+            dropDown.disabled = true;
+            
             ["freeRoomsTable", "usedRoomsTable"].forEach(tableId => {
                 const table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
                 table.innerHTML = '';
@@ -348,6 +351,11 @@
             });
         }
 
+        function removeSkeleton() {
+            const dropDown = document.getElementById('menu-button');
+            dropDown.disabled = false;
+        }
+
         // Fonction pour mettre à jour les salles libres et occupées
         async function updateTable(date, time) {
             // Remplace les données par le squellette de chargement
@@ -363,6 +371,7 @@
             // On efface le squelette de chargement
             const freeRoomsTable = document.getElementById('freeRoomsTable').getElementsByTagName('tbody')[0];
             freeRoomsTable.innerHTML = '';
+            removeSkeleton();
             freeRoomsTable.classList.remove('animate-pulse');
             const usedRoomsTable = document.getElementById('usedRoomsTable').getElementsByTagName('tbody')[0];
             // On affiche les salles libres
@@ -383,6 +392,7 @@
 
             // On efface le squelette de chargement
             usedRoomsTable.innerHTML = '';
+            removeSkeleton();
             usedRoomsTable.classList.remove('animate-pulse');
             // On affiche les salles occupées
             for (const room of Object.keys(usedRooms)) {
@@ -435,6 +445,13 @@
             // Et enfin on les trie
             sortUsedRooms();
             sortFreeRooms();
+            if(!date || !time) {
+                const now = new Date();
+                const options = { weekday: 'long', month: 'long', day: 'numeric' };
+                date = now.toLocaleDateString('fr-FR', options);
+                time = now.toTimeString().split(' ')[0].slice(0, 5);
+            }
+            document.getElementsByClassName('menu-button-text')[0].innerText = `${date} à ${time}`;
         }
     </script>
 </body>
