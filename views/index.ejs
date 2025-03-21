@@ -95,7 +95,274 @@
                 updateTable(date, time);
             });
         });
+
+        // Variables globales pour stocker les données de toutes les salles
+        let allRoomsData = {
+            freeRooms: {},
+            usedRooms: {}
+        };
+
+        // Fonction pour ouvrir le modal avec les détails d'une salle
+        function openRoomDetailsModal(roomName) {
+            const modal = document.getElementById('roomDetailsModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalContent = document.getElementById('modalContent');
+            
+            // Définir le titre du modal
+            modalTitle.textContent = `Détails de la salle: ${roomName}`;
+            
+            // Afficher le loading state
+            modalContent.innerHTML = `
+                <div class="animate-pulse">
+                    <div class="h-5 bg-gray-200 rounded mb-2"></div>
+                    <div class="h-5 bg-gray-200 rounded mb-2 w-3/4"></div>
+                    <div class="h-5 bg-gray-200 rounded mb-2"></div>
+                    <div class="h-5 bg-gray-200 rounded w-1/2"></div>
+                </div>
+            `;
+            
+            // Afficher le modal
+            modal.classList.remove('hidden');
+            
+            // Récupérer les données de la salle
+            let roomData = null;
+            if (allRoomsData.freeRooms[roomName]) {
+                roomData = allRoomsData.freeRooms[roomName];
+                displayRoomDetails(roomName, roomData, true);
+            } else if (allRoomsData.usedRooms[roomName]) {
+                roomData = allRoomsData.usedRooms[roomName];
+                displayRoomDetails(roomName, roomData, false);
+            }
+        }
+
+        // Fonction pour afficher les détails de la salle dans le modal
+        function displayRoomDetails(roomName, roomData, isFree) {
+            const modalContent = document.getElementById('modalContent');
+            const now = new Date();
+            
+            // Statut actuel de la salle
+            let currentStatus = isFree 
+                ? `<div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4">
+                    <p class="font-bold">Actuellement libre</p>
+                </div>`
+                : `<div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+                    <p class="font-bold">Actuellement occupée</p>
+                </div>`;
+            
+            // Préparer la timeline des cours
+            let courses = isFree ? [] : roomData.courses || [];
+            let nextCourse = isFree ? roomData.nextCourse : null;
+            
+            if (nextCourse) {
+                courses.push(nextCourse);
+            }
+            
+            if (courses.length === 0) {
+                // Pas de cours aujourd'hui
+                modalContent.innerHTML = `
+                    ${currentStatus}
+                    <div class="text-center py-6">
+                        <p class="text-lg font-medium text-gray-600">Aucun cours prévu aujourd'hui</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Trier les cours par heure de début
+            courses.sort((a, b) => {
+                const dateA = toDate(a.dtstart);
+                const dateB = toDate(b.dtstart);
+                return dateA - dateB;
+            });
+            
+            // Créer la timeline
+            let timelineHTML = `<div class="timeline">`;
+            
+            courses.forEach(course => {
+                const startTime = toDate(course.dtstart);
+                const endTime = toDate(course.dtend);
+                const isCurrentCourse = now >= startTime && now <= endTime;
+                const isPastCourse = now > endTime;
+                
+                let statusClass = isCurrentCourse ? 'busy' : (isPastCourse ? 'past' : 'free');
+                let timeDisplay = `${startTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} - ${endTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+                
+                timelineHTML += `
+                    <div class="timeline-item ${statusClass}">
+                        <div class="font-bold">${timeDisplay}</div>
+                        <div class="text-gray-600">${course.summary.split("-")[0] || 'Cours non précisé'}</div>
+                    </div>
+                `;
+            });
+            
+            timelineHTML += `</div>`;
+            
+            // Afficher tout dans le modal
+            modalContent.innerHTML = `
+                ${currentStatus}
+                <h4 class="font-medium text-lg mb-2">Planning de la journée:</h4>
+                ${timelineHTML}
+            `;
+        }
+
+        // Fonction pour fermer le modal
+        function closeModal() {
+            const modal = document.getElementById('roomDetailsModal');
+            modal.classList.add('hidden');
+        }
+
+        // Modifier la fonction updateTable pour rendre les lignes cliquables et stocker les données
+        async function updateTable(date, time) {
+            // Code existant pour addSkeleton()
+            addSkeleton();
+            
+            const query = date && time ? `?date=${date}&time=${time}` : '';
+            const response = await axios.get(`/salles/univ/${univ}/rooms${query}`);
+            const result = response.data;
+            
+            // Stocker toutes les données
+            allRoomsData = {
+                freeRooms: result.freeRooms,
+                usedRooms: result.usedRooms
+            };
+            
+            // Mise à jour du tableau des salles libres
+            const freeRoomsTable = document.getElementById('freeRoomsTable').getElementsByTagName('tbody')[0];
+            freeRoomsTable.innerHTML = '';
+            removeSkeleton();
+            freeRoomsTable.classList.remove('animate-pulse');
+            
+            // Afficher les salles libres avec des lignes cliquables
+            for (const room of Object.keys(result.freeRooms)) {
+                const row = document.createElement('tr');
+                row.className = 'clickable-row'; // Ajouter la classe pour le style hover
+                row.onclick = function() { openRoomDetailsModal(room); }; // Ajouter l'event handler
+                
+                const roomCell = document.createElement('td');
+                const nextClassCell = document.createElement('td');
+                roomCell.className = 'px-4 py-4 whitespace-nowrap text-center';
+                nextClassCell.className = 'px-4 py-4 whitespace-nowrap text-center';
+                roomCell.innerText = room;
+                nextClassCell.innerText = result.freeRooms[room].nextCourse != null ? 
+                    (new Date(toDate(result.freeRooms[room].nextCourse.dtstart))).toLocaleTimeString('fr-FR',
+                        { hour: '2-digit', minute: '2-digit', hour12: false })
+                    : 'Aucun cours prévu';
+                
+                row.appendChild(roomCell);
+                row.appendChild(nextClassCell);
+                freeRoomsTable.appendChild(row);
+            }
+            
+            // Mise à jour du tableau des salles occupées
+            const usedRoomsTable = document.getElementById('usedRoomsTable').getElementsByTagName('tbody')[0];
+            usedRoomsTable.innerHTML = '';
+            removeSkeleton();
+            usedRoomsTable.classList.remove('animate-pulse');
+            
+            // Afficher les salles occupées avec des lignes cliquables
+            for (const room of Object.keys(result.usedRooms)) {
+                const row = document.createElement('tr');
+                row.className = 'clickable-row'; // Ajouter la classe pour le style hover
+                row.onclick = function() { openRoomDetailsModal(room); }; // Ajouter l'event handler
+                
+                const roomCell = document.createElement('td');
+                const nextClassCell = document.createElement('td');
+                roomCell.className = 'px-4 py-4 whitespace-nowrap text-center';
+                nextClassCell.className = 'px-4 py-4 whitespace-nowrap text-center';
+                roomCell.innerText = room;
+                
+                nextClassCell.innerText = result.usedRooms[room].willBeFree != null ? 
+                    (new Date(result.usedRooms[room].willBeFree)).toLocaleTimeString('fr-FR',
+                        { hour: '2-digit', minute: '2-digit', hour12: false }) 
+                    : 'Aucun cours prévu';
+                
+                row.appendChild(roomCell);
+                row.appendChild(nextClassCell);
+                usedRoomsTable.appendChild(row);
+            }
+            
+            // Le reste du code existant pour les salles invalides et le tri
+            // ...
+            
+            sortUsedRooms();
+            sortFreeRooms();
+            
+            // Code existant pour mettre à jour la date et l'heure affichées
+            // ...
+        }
+
+        // Ajouter un event listener pour fermer le modal
+        document.addEventListener('DOMContentLoaded', function() {
+            const closeModalBtn = document.getElementById('closeModal');
+            const modal = document.getElementById('roomDetailsModal');
+            
+            closeModalBtn.addEventListener('click', closeModal);
+            
+            // Fermer le modal si on clique en dehors
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        });
     </script>
+    <style>
+        /* Styles existants... */
+        
+        .clickable-row {
+            cursor: pointer;
+        }
+        
+        .clickable-row:hover {
+            background-color: rgba(79, 70, 229, 0.1);
+        }
+        
+        .timeline {
+            position: relative;
+            margin-left: 20px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 2px;
+            background-color: #e5e7eb;
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 20px;
+            padding-bottom: 1.5rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #4f46e5;
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item.current::before {
+            background-color: #10b981;
+        }
+        
+        .timeline-item.busy::before {
+            background-color: #ef4444;
+        }
+        
+        .timeline-item.free::before {
+            background-color: #10b981;
+        }
+    </style>
 </head>
 
 <body class="h-full bg-gray-100 <%= univ %>">
@@ -281,6 +548,27 @@
             </div>
         </footer>
     </div>
+    <!-- Modal pour les détails de salle -->
+    <div id="roomDetailsModal" class="fixed inset-0 z-50 hidden overflow-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-2xl w-full mx-auto p-6 shadow-xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modalTitle" class="text-xl font-bold text-gray-900"></h3>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div id="modalContent" class="mb-4">
+                <div class="animate-pulse">
+                    <div class="h-5 bg-gray-200 rounded mb-2"></div>
+                    <div class="h-5 bg-gray-200 rounded mb-2 w-3/4"></div>
+                    <div class="h-5 bg-gray-200 rounded mb-2"></div>
+                    <div class="h-5 bg-gray-200 rounded w-1/2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         const univ = '<%= univ %>';
         sortUsedRooms();
@@ -368,6 +656,12 @@
             const usedRooms = result.usedRooms;
             const invalidRooms = Object.values(result.invalidRooms);
 
+            // Stocker toutes les données
+            allRoomsData = {
+                freeRooms: result.freeRooms,
+                usedRooms: result.usedRooms
+            };
+
             // On efface le squelette de chargement
             const freeRoomsTable = document.getElementById('freeRoomsTable').getElementsByTagName('tbody')[0];
             freeRoomsTable.innerHTML = '';
@@ -377,6 +671,8 @@
             // On affiche les salles libres
             for (const room of Object.keys(freeRooms)) {
                 const row = document.createElement('tr');
+                row.className = 'clickable-row'; // Ajouter la classe pour le style hover
+                row.onclick = function() { openRoomDetailsModal(room); }; // Ajouter l'event handler
                 const roomCell = document.createElement('td');
                 const nextClassCell = document.createElement('td');
                 roomCell.className = 'px-4 py-4 whitespace-nowrap text-center';
@@ -397,6 +693,8 @@
             // On affiche les salles occupées
             for (const room of Object.keys(usedRooms)) {
                 const row = document.createElement('tr');
+                row.className = 'clickable-row'; // Ajouter la classe pour le style hover
+                row.onclick = function() { openRoomDetailsModal(room); }; // Ajouter l'event handler
                 const roomCell = document.createElement('td');
                 const nextClassCell = document.createElement('td');
                 roomCell.className = 'px-4 py-4 whitespace-nowrap text-center';
@@ -434,7 +732,7 @@
                 }
                 invalidRoomsContainer.appendChild(invalidRoomsList);
 
-                document.querySelector('.content').insertBefore(invalidRoomsContainer, document.querySelector('main').children[3]);
+                document.querySelector('.content').appendChild(invalidRoomsContainer);
             } else {
                 const invalidRoomsContainer = document.querySelector('.bg-red-100');
                 if (invalidRoomsContainer) {
